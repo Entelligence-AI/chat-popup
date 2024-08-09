@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embedded React App</title>
+</head>
+<body>
+<!-- Other content of the HTML page -->
+
+<!-- Include React app JavaScript -->
+<script src="/dist/entelligence-chat.js"></script>
+
+<!-- Initialize the React app -->
+<script>
+    console.log(window)
+    window.ReactApp.init({
+        analyticsData: {
+            referrer: document.referrer,
+            userAgent: navigator.userAgent,
+            // Other data
+        }
+    });
+</script>
+</body>
+</html>
