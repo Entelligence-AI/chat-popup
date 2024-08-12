@@ -51,7 +51,7 @@ next-env.d.ts
 .env.production
 
 #Jetbrains
-.idea/
+.idea
 
 
 
