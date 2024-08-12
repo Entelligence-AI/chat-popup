@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import {FC} from "react";
 import {
     AssistantModal,
     AssistantModalPrimitive,
@@ -15,18 +15,21 @@ import { coldarkDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import remarkGfm from "remark-gfm";
 
 import '../index.css';
-import '../modal.css';
-import "../assistant-ui.css";
+import "@assistant-ui/react/styles/index.css";
+import "@assistant-ui/react/styles/modal.css";
+
 
 type AppProps = {
    apiKey: string;
 }
 
 export const App = ({ apiKey }: AppProps) => {
+    console.log('apiKey', apiKey)
+
+
     return (
         <div>
-            {/*<h1>Welcome to the Embedded React App</h1>*/}
-            {/* Your app content */}
+            { apiKey && <DocsChat />}
         </div>
     );
 };
@@ -147,20 +150,24 @@ const MyThread: FC = () => {
                 className="text-muted-foreground flex w-full items-center justify-center gap-2 border-t py-2 text-xs"
             >
                 In partnership with{" "}
-                <img
-                    src="entelligence-light.png"
-                    className="dark:hidden"
-                    alt="Entelligence Logo"
-                    height={14}
-                    width={113}
-                />
-                <img
-                    src="entelligence-dark.png"
-                    className="hidden dark:block"
-                    alt="Entelligence Logo"
-                    height={14}
-                    width={113}
-                />
+                <div
+                    className="hidden h-[14px] w-[113px] dark:hidden"
+                >
+                    <img
+                        src="/assets/entelligence-dark.png"
+                        alt="Entelligence"
+                        className="h-[14px]"
+                    />
+                </div>
+                <div
+                    className="hidden h-[14px] w-[113px] dark:block"
+                >
+                    <img
+                        src="/assets/entelligence-light.png"
+                        alt="Entelligence"
+                        className="h-[14px]"
+                    />
+                </div>
             </a>
         </Thread.Root>
     );

@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vite + React + TS</title>
+</head>
+<body>
+<div id="root"></div>
+<script type="module" src="https://d345f39z3arwqc.cloudfront.net/entelligence-chat.js"></script>
+<script type="module">
+  window.ReactApp.init({
+    analyticsData: {
+      referrer: document.referrer,
+      userAgent: navigator.userAgent,
+      apiKey: "1234567890",
+      // Other data
+    }
+  });
+</script>
+</body>
+</html>
