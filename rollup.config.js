@@ -6,7 +6,6 @@ import typescript from 'rollup-plugin-typescript2';
 import injectProcessEnv from 'rollup-plugin-inject-process-env';
 import json from "@rollup/plugin-json";
 import commonjs from "@rollup/plugin-commonjs";
-import image from '@rollup/plugin-image';
 
 export default [
     {
@@ -43,7 +42,6 @@ export default [
             injectProcessEnv({
                 NODE_ENV: 'production', // Inject NODE_ENV=production
             }),
-            image(),
             terser(), // Minify the output
         ],
     },
