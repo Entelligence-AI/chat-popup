@@ -34,6 +34,7 @@ Properties:
       repoName: "my-repo",
       organization: "my-org",
       apiKey: "1234567890",
+    theme: 'light' | 'dark'
       // Other data
     }
   });
