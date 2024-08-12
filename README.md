@@ -32,6 +32,7 @@ Properties:
   window.EntelligenceChat.init({
     analyticsData: {
       repoName: "my-repo",
+      organization: "my-org",
       apiKey: "1234567890",
       // Other data
     }

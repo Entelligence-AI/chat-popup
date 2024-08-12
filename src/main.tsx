@@ -2,7 +2,7 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './app';
 
-const init = ({ analyticsData }: { analyticsData: { apiKey: string, repoName: string }}) => {
+const init = ({ analyticsData }: { analyticsData: { apiKey: string; repoName: string; organization: string }}) => {
     const reactContainer = document.createElement('div');
     reactContainer.id = 'react-app-container';
 
