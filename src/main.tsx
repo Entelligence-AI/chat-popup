@@ -2,7 +2,7 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './app';
 
-const init = ({ analyticsData }: { analyticsData: { apiKey: string }}) => {
+const init = ({ analyticsData }: { analyticsData: { apiKey: string, repoName: string }}) => {
     const reactContainer = document.createElement('div');
     reactContainer.id = 'react-app-container';
 
@@ -18,5 +18,5 @@ const init = ({ analyticsData }: { analyticsData: { apiKey: string }}) => {
     }
 };
 
-(window as any).ReactApp = { init };
+(window as any).EntelligenceChat = { init };
 

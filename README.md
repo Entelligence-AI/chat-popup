@@ -1,50 +1,49 @@
-# React + TypeScript + Vite
+# Entelligence Chat
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is a simple chat application that uses the Entelligence API + Assistant-UI to send and receive messages bases on your repository information.
 
-Currently, two official plugins are available:
+## Requirements
+- Entelligence API key
+- Repository name
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## Installation
+```bash
+pnpm install
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+## Usage
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+```bash
+pnpm dev
 ```
+
+## How to embed the chat in your website
+you need to import the script, and after call the script to initialize the chat.
+
+Properties:
+- `analyticsData`: Object with the data that you want to send to the Entelligence API. The properties `apiKey` and `repository` are required.
+- `apiKey`: The Entelligence API key.
+- `repoName`: The repository name.
+
+**Example**:
+```html
+<script type="module" src="https://d345f39z3arwqc.cloudfront.net/entelligence-chat.js"></script>
+<script type="module">
+  window.EntelligenceChat.init({
+    analyticsData: {
+      repoName: "my-repo",
+      apiKey: "1234567890",
+      // Other data
+    }
+  });
+</script>
+```
+
+## Technologies
+- [React](https://reactjs.org/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Vite](https://vitejs.dev/)
+- [AssistanUi](https://assistant-ui.com/)
+
+## License
+[MIT](https://choosealicense.com/licenses/mit/)
