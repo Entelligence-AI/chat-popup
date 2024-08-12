@@ -7,15 +7,14 @@
     <title>Vite + React + TS</title>
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-    <script type="module">
+  <script type="module" src="/src/main.tsx"></script>
+    <script type="module" defer>
       window.EntelligenceChat.init({
         analyticsData: {
-          repoName: 'Yonom',
-          organization: 'assistant-ui',
+          repoName: 'assistant-ui',
+          organization: 'Yonom',
           apiKey: "1234567890",
-          theme: 'light',
+          theme: 'system',
           // Other data
         }
       });

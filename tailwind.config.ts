@@ -4,9 +4,7 @@ export default {
   ],
   plugins: [
     require("tailwindcss-animate"),
-    require("@assistant-ui/react/tailwindcss")({
-      components: ["assistant-modal"],
-    }),
-    require('@assistant-ui/react-markdown/tailwindcss'),
+    require("@assistant-ui/react/tailwindcss"),
+    require("@assistant-ui/react-markdown/tailwindcss"),
   ],
 };

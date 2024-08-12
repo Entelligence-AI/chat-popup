@@ -1,23 +1,29 @@
-import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './app';
-import {AnalyticsData} from "@/types";
+import { InitType } from "@/types";
+import { PostHogProvider} from 'posthog-js/react'
 
-const init = ({ analyticsData }: AnalyticsData) => {
+import './index.css';
+
+const options = {
+    api_host: 'https://us.i.posthog.com',
+}
+
+const init = ({ analyticsData }: InitType) => {
     const reactContainer = document.createElement('div');
-    reactContainer.id = 'react-app-container';
-    document.body.classList.add(analyticsData.theme)
 
-    if (!document.getElementById('react-app-container')) {
-        document.body.appendChild(reactContainer);
-        const root = createRoot(reactContainer);
-        const el = (
-            <React.StrictMode>
-                <App analyticsData={analyticsData} />
-            </React.StrictMode>
-        )
-        root.render(el)
-    }
+    reactContainer.id = 'react-app-container';
+    document.body.appendChild(reactContainer);
+    const root = createRoot(reactContainer);
+    const el = (
+        <PostHogProvider
+            apiKey='phc_1ttc13N2t7AvMZvzFdJ3ppJ1wJGDuql1nuo4Copgqbu'
+            options={options}
+        >
+            <App {...analyticsData}/>
+        </PostHogProvider>
+    )
+    root.render(el)
 };
 
 (window as any).EntelligenceChat = { init };
