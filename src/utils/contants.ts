@@ -1,0 +1,1 @@
+export const apiUrl = "https://entelligence.ddbrief.com/";
