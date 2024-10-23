@@ -88,7 +88,8 @@ const MyCustomAdapter = ({ apiKey, repoName, organization }: AnalyticsData) => {
                     history: [],
                     vectorDBUrl: `${organization}&${repoName}`,
                     enableArtifacts: false,
-                    advancedAgent: false                
+                    advancedAgent: false,
+                    limitSources: 3          
                 }),
                 signal: abortSignal,
             });
