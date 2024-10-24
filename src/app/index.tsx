@@ -113,7 +113,7 @@ export const DocsChat = ({ repoName, organization, apiKey }: AnalyticsData) => {
         <MyAssistantModal
             runtime={runtime}
             welcome={{
-                message: "Ask any question about assistant-ui",
+                message: `Ask any question about ${repoName}`,
             }}
             assistantMessage={{ components: { Text: MarkdownText } }}
             organization={organization}
