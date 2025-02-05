@@ -1,4 +1,4 @@
-import {FC, useEffect} from "react";
+import {FC, useEffect, useState} from "react";
 import {
     AssistantModal,
     AssistantModalPrimitive,
@@ -24,6 +24,7 @@ import {usePostHog} from "posthog-js/react";
 
 export const App = ({ apiKey, repoName, organization }: AnalyticsData) => {
     const posthog = usePostHog();
+	const [numQuestions, setNumQuestions] = useState(0);
 
     useEffect(() => {
         posthog?.capture('chat_initialized', {
@@ -33,9 +34,14 @@ export const App = ({ apiKey, repoName, organization }: AnalyticsData) => {
         })
     }, [apiKey, repoName, organization]);
 
+	useEffect(() => {
+    console.log("Number of questions asked:", numQuestions);
+}, [numQuestions]);
+
+
     return (
         <div>
-            { apiKey && <DocsChat apiKey={apiKey} organization={organization} repoName={repoName}/>}
+            { apiKey && <DocsChat apiKey={apiKey} organization={organization} repoName={repoName} numQuestions={numQuestions} setNumQuestions={setNumQuestions}/>}
         </div>
     );
 };
@@ -71,11 +77,13 @@ const MarkdownText = makeMarkdownText({
     },
 });
 
-const MyCustomAdapter = ({ apiKey, repoName, organization }: AnalyticsData) => {
+const MyCustomAdapter = ({ apiKey, repoName, organization, numQuestions, setNumQuestions }: AnalyticsData) => {
     return {
         async* run({messages, abortSignal}: { messages: any, abortSignal: AbortSignal}) {
             const { content: question, role } = messages.pop()!;
             if (role !== "user" || !question) throw new Error("No question provided");
+			
+			if (setNumQuestions) setNumQuestions((numQuestions) => numQuestions + 1);
 
             const response = await fetch("https://entelligence.ddbrief.com/repositoryAgent/", {
                 method: "POST",
@@ -105,8 +113,8 @@ const MyCustomAdapter = ({ apiKey, repoName, organization }: AnalyticsData) => {
     }
 }
 
-export const DocsChat = ({ repoName, organization, apiKey }: AnalyticsData) => {
-    const adapter = MyCustomAdapter({ apiKey, repoName, organization });
+export const DocsChat = ({ repoName, organization, apiKey, setNumQuestions, numQuestions }: AnalyticsData) => {
+    const adapter = MyCustomAdapter({ apiKey, repoName, organization, numQuestions, setNumQuestions });
     const runtime = useLocalRuntime(adapter as ChatModelAdapter);
 
     return (
@@ -119,6 +127,8 @@ export const DocsChat = ({ repoName, organization, apiKey }: AnalyticsData) => {
             organization={organization}
             repoName={repoName}
             apiKey={apiKey}
+			numQuestions={numQuestions}
+			setNumQuestions={setNumQuestions}
         />
     );
 };
@@ -130,9 +140,11 @@ const MyAssistantModal: FC<ThreadConfig&AnalyticsData> = (config) => {
                 apiKey={config.apiKey}
                 repoName={config.repoName}
                 organization={config.organization}
+				numQuestions={config.numQuestions}
+				setNumQuestions={config.setNumQuestions}
             />
             <AssistantModal.Content style={{width: '600px', height: '620px'}}>
-                <MyThread />
+                <MyThread numQuestions={config.numQuestions} />
             </AssistantModal.Content>
         </AssistantModal.Root>
     );
@@ -154,7 +166,7 @@ const MyAssistantModalTrigger: FC<AnalyticsData> = ({ repoName, organization, ap
     );
 };
 
-const MyThread: FC = () => {
+const MyThread: FC<{ numQuestions: number }> = ({ numQuestions }) => {
     return (
         <Thread.Root className="flex flex-col">
             <Thread.Viewport>
@@ -166,6 +178,14 @@ const MyThread: FC = () => {
                     <Thread.ScrollToBottom />
                     <Composer />
                 </Thread.ViewportFooter>
+					{numQuestions >= 3 && (
+						<button 
+							className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition mx-auto"
+							onClick={() => alert("Redirecting to Maintainer...")}
+						>
+							Ask Question to Maintainer Directly
+						</button>
+					)}
             </Thread.Viewport>
 
             <a
