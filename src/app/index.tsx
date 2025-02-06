@@ -228,7 +228,7 @@ const OssSlack: FC<{
 
 	return (
 		<div className="flex flex-col items-center">
-			{numQuestions >= 0 && (
+			{numQuestions >= 3 && (
 				<>
 					{!showForm ? (
 						<button
