@@ -164,7 +164,7 @@ const MyAssistantModalTrigger: FC<AnalyticsData> = ({ repoName, organization, ap
 
 const sendSlackQuery = async (apiKey: string, vectorDBUrl: string, chatHist: string, question: string, userEmail: string) => {
     try {
-		const url = "http://localhost:8000/bot/send-query";
+		const url = "https://entelligence.ddbrief.com/bot/send-query";
         const response = await fetch(url, {
             method: "POST",
             headers: {
