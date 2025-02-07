@@ -232,7 +232,6 @@ const OssSlack: FC<{
 		<div className="flex flex-col items-end w-full">
 			{numQuestions >= 3 && (
 				<>
-					{/* Slack Button */}
 					{!showForm ? (
 						<button
 							className="mt-4 p-2 rounded-full shadow-md hover:opacity-80 transition relative group flex items-center"
@@ -244,9 +243,7 @@ const OssSlack: FC<{
 							</span>
 						</button>
 					) : (
-						/* Popup Form */
 						<div className="mt-4 p-3 border border-gray-300 rounded-lg shadow-md w-full max-w-sm bg-white relative">
-							{/* Close Button */}
 							<button
 								className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
 								onClick={() => setShowForm(false)}
