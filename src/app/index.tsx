@@ -14,6 +14,8 @@ import { makeMarkdownText } from "@assistant-ui/react-markdown";
 import { makePrismAsyncSyntaxHighlighter } from "@assistant-ui/react-syntax-highlighter";
 import { coldarkDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import remarkGfm from "remark-gfm";
+import { FaSlack } from "react-icons/fa";
+import { IoClose } from "react-icons/io5";
 
 import "@assistant-ui/react-markdown/styles/tailwindcss/markdown.css";
 import "@assistant-ui/react/styles/index.css";
@@ -227,18 +229,31 @@ const OssSlack: FC<{
 	};
 
 	return (
-		<div className="flex flex-col items-center">
-			{numQuestions >= 3 && (
+		<div className="flex flex-col items-end w-full">
+			{numQuestions >= 0 && (
 				<>
+					{/* Slack Button */}
 					{!showForm ? (
 						<button
-							className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition"
+							className="mt-4 p-2 rounded-full shadow-md hover:opacity-80 transition relative group flex items-center"
 							onClick={() => setShowForm(true)}
 						>
-							Ask question to maintainer directly
+							<FaSlack size={24} color="#C7E576" />
+							<span className="absolute left-full top-1/2 -translate-y-1/2 ml-2 opacity-0 group-hover:opacity-100 bg-black text-white text-xs rounded px-2 py-1 transition-opacity">
+								Ask a maintainer directly
+							</span>
 						</button>
 					) : (
-						<div className="mt-4 p-4 border border-gray-300 rounded-lg shadow-md w-full max-w-md bg-white">
+						/* Popup Form */
+						<div className="mt-4 p-3 border border-gray-300 rounded-lg shadow-md w-full max-w-sm bg-white relative">
+							{/* Close Button */}
+							<button
+								className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+								onClick={() => setShowForm(false)}
+							>
+								<IoClose size={20} />
+							</button>
+
 							{!submitted ? (
 								<>
 									<label className="block text-sm font-medium text-gray-700 mb-1">
@@ -270,33 +285,33 @@ const OssSlack: FC<{
 									<button
 										className={`mt-3 w-full text-white py-2 rounded-md transition ${loading
 												? 'bg-gray-400 cursor-not-allowed'
-												: 'bg-green-600 hover:bg-green-700'
+												: 'bg-[#C7E576] text-black hover:opacity-80'
 											}`}
 										onClick={handleSubmit}
-                    disabled={loading}
-                  >
-                    {loading ? 'Submitting...' : 'Submit'}
-                  </button>
-                </>
-              ) : (
-                <div className="text-center">
-                  <p className="text-sm text-gray-600">
-                    Thank you! Your question has been submitted.
-                  </p>
-                  <p className="mt-2">
-                    <strong>Email:</strong> {email}
-                  </p>
-                  <p className="mt-1">
-                    <strong>Question:</strong> {question}
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
-        </>
-      )}
-    </div>
-  );
+										disabled={loading}
+									>
+										{loading ? 'Submitting...' : 'Submit'}
+									</button>
+								</>
+							) : (
+								<div className="text-center">
+									<p className="text-sm text-gray-600">
+										Thank you! Your question has been submitted.
+									</p>
+									<p className="mt-2">
+										<strong>Email:</strong> {email}
+									</p>
+									<p className="mt-1">
+										<strong>Question:</strong> {question}
+									</p>
+								</div>
+							)}
+						</div>
+					)}
+				</>
+			)}
+		</div>
+	);
 };
 
 const MyThread:  FC<{ numQuestions: number; apiKey: string; vectorDBUrl: string }> = ({ numQuestions, apiKey, vectorDBUrl }) => {
