@@ -277,7 +277,7 @@ const OssSlack: FC<{
 							>
 								<span className="flex items-center gap-2">
 									<span className="text-sm font-medium text-[#3c3c3c]">
-										Add to Slack
+										Reach Owners on Slack
 									</span>
 									<FaSlack size={24} className="text-[#c7e576]" />
 								</span>
@@ -294,7 +294,7 @@ const OssSlack: FC<{
 								<div className="flex items-center gap-2 mb-3">
 									<FaSlack size={24} className="text-[#c7e576]" />
 									<h3 className="text-lg font-semibold text-gray-700">
-										Add to Slack
+										Reach Owners on Slack
 									</h3>
 								</div>
 
