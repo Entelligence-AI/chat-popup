@@ -166,7 +166,7 @@ const MyAssistantModalTrigger: FC<AnalyticsData> = ({ repoName, organization, ap
 
 const sendSlackQuery = async (apiKey: string, vectorDBUrl: string, chatHist: string, question: string, userEmail: string) => {
     try {
-		const url = "http://localhost:8000/bot/send-query";
+		const url = "https://entelligence.ddbrief.com/bot/send-query";
         const response = await fetch(url, {
             method: "POST",
             headers: {
@@ -192,7 +192,8 @@ const sendSlackQuery = async (apiKey: string, vectorDBUrl: string, chatHist: str
 
 const isOssQueryAllowed = async (apiKey: string, vectorDBUrl: string): Promise<boolean> => {
     try {
-        const response = await fetch("http://localhost:8000/slack_oss_repo_allow_query", {
+		const url = "https://entelligence.ddbrief.com/bot/allow-query";
+        const response = await fetch(url, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -216,135 +217,139 @@ const isOssQueryAllowed = async (apiKey: string, vectorDBUrl: string): Promise<b
 
 
 const OssSlack: FC<{
-  numQuestions: number;
-  apiKey: string;
-  vectorDBUrl: string;
-  chatHist: string;
+	numQuestions: number;
+	apiKey: string;
+	vectorDBUrl: string;
+	chatHist: string;
 }> = ({ numQuestions, apiKey, vectorDBUrl, chatHist }) => {
-  const [showForm, setShowForm] = useState(false);
-  const [email, setEmail] = useState('');
-  const [question, setQuestion] = useState('');
-  const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [allowed, setAllowed] = useState<boolean>(false);
+	const [showForm, setShowForm] = useState(false);
+	const [email, setEmail] = useState('');
+	const [question, setQuestion] = useState('');
+	const [submitted, setSubmitted] = useState(false);
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState<string | null>(null);
+	const [allowed, setAllowed] = useState<boolean>(false);
 
-  useEffect(() => {
-    const checkIfOssQueryIsAllowed = async () => {
-      const result = await isOssQueryAllowed(apiKey, vectorDBUrl);
-      setAllowed(result);
-    };
-    checkIfOssQueryIsAllowed();
-  }, [apiKey, vectorDBUrl]);
+	useEffect(() => {
+		const checkIfOssQueryIsAllowed = async () => {
+			const result = await isOssQueryAllowed(apiKey, vectorDBUrl);
+			setAllowed(result);
+		};
+		checkIfOssQueryIsAllowed();
+	}, [apiKey, vectorDBUrl]);
 
-  const handleSubmit = async () => {
-    if (!email || !question) {
-      alert('Please enter both email and question.');
-      return;
-    }
+	const handleSubmit = async () => {
+		if (!email || !question) {
+			alert('Please enter both email and question.');
+			return;
+		}
 
-    setLoading(true);
-    setError(null);
+		setLoading(true);
+		setError(null);
 
-    const result = await sendSlackQuery(
-      apiKey,
-      vectorDBUrl,
-      chatHist,
-      question,
-      email
-    );
+		const result = await sendSlackQuery(
+			apiKey,
+			vectorDBUrl,
+			chatHist,
+			question,
+			email
+		);
 
-    if (result.success) {
-      setSubmitted(true);
-    } else {
-      setError('Error sending message. Please try again later!');
-    }
-    setLoading(false);
-  };
+		if (result.success) {
+			setSubmitted(true);
+		} else {
+			setError('Error sending message. Please try again later!');
+		}
+		setLoading(false);
+	};
 
-  return (
-	  <div className="flex flex-col items-end w-full">
-		  {!allowed ? (
-			  <div></div>
-		  ) : (
-			  numQuestions >= 3 && (
-				  <>
-					  {!showForm ? (
-						  <button
-							  className="mt-4 p-2 rounded-full shadow-md hover:opacity-80 transition relative group flex items-center"
-							  onClick={() => setShowForm(true)}
-						  >
-							  <FaSlack size={24} color="#C7E576" />
-							  <span className="absolute left-full top-1/2 -translate-y-1/2 ml-2 opacity-0 group-hover:opacity-100 bg-black text-white text-xs rounded px-2 py-1 transition-opacity">
-								  Ask a maintainer directly
-							  </span>
-						  </button>
-					  ) : (
-						  <div className="mt-4 p-3 border border-gray-300 rounded-lg shadow-md w-full max-w-sm bg-white relative">
-							  <button
-								  className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-								  onClick={() => setShowForm(false)}
-							  >
-								  <IoClose size={20} />
-							  </button>
+	return (
+		<div className="flex flex-col items-end w-full">
+			{!allowed ? (
+				<div></div>
+			) : (
+				numQuestions >= 3 && (
+					<>
+						{!showForm ? (
+							<button
+								className="mt-4 p-2 rounded-md shadow-md hover:opacity-80 transition relative group flex items-center gap-2"
+								onClick={() => setShowForm(true)}
+							>
+								<span className="flex items-center gap-2">
+									<span className="text-sm font-medium text-[#3c3c3c]">
+										Add to Slack
+									</span>
+									<FaSlack size={24} className="text-[#c7e576]" />
+								</span>
+							</button>
+						) : (
+							<div className="mt-4 p-3 border border-gray-300 rounded-lg shadow-md w-full max-w-sm bg-white relative">
+								<button
+									className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+									onClick={() => setShowForm(false)}
+								>
+									<IoClose size={20} />
+								</button>
 
-							  {!submitted ? (
-								  <>
-									  <label className="block text-sm font-medium text-gray-700 mb-1">
-										  Email:
-									  </label>
-									  <input
-										  type="email"
-										  value={email}
-										  onChange={(e) => setEmail(e.target.value)}
-										  className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-										  placeholder="Enter your email"
-									  />
+								<div className="flex items-center gap-2 mb-3">
+									<FaSlack size={24} className="text-[#c7e576]" />
+									<h3 className="text-lg font-semibold text-gray-700">
+										Add to Slack
+									</h3>
+								</div>
 
-									  <label className="block text-sm font-medium text-gray-700 mt-3 mb-1">
-										  Your Question:
-									  </label>
-									  <textarea
-										  value={question}
-										  onChange={(e) => setQuestion(e.target.value)}
-										  className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-										  placeholder="Enter your question"
-										  rows={3}
-									  ></textarea>
+								{!submitted ? (
+									<>
+										<input
+											type="email"
+											value={email}
+											onChange={(e) => setEmail(e.target.value)}
+											className="w-full p-2 bg-[#f4f4f4] border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+											placeholder="Email"
+										/>
 
-									  {error && (
-										  <p className="text-red-500 text-sm mt-2">{error}</p>
-									  )}
+										<textarea
+											value={question}
+											onChange={(e) => setQuestion(e.target.value)}
+											className="w-full p-2 mt-3 bg-[#f4f4f4] border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+											placeholder="Enter your question"
+											rows={3}
+										></textarea>
 
-									  <button
-										  className={`mt-3 w-full text-white py-2 rounded-md transition ${loading
-												  ? 'bg-gray-400 cursor-not-allowed'
-												  : 'bg-[#C7E576] text-black hover:opacity-80'
-											  }`}
-										  onClick={handleSubmit}
-										  disabled={loading}
-									  >
-										  {loading ? 'Submitting...' : 'Submit'}
-									  </button>
-								  </>
-							  ) : (
-								  <div className="text-center">
-									  <p className="text-sm text-gray-600">
-										  Thank you! Your question has been submitted.
-									  </p>
-									  <p className="mt-2">
-										  <strong>Email:</strong> {email}
-									  </p>
-									  <p className="mt-1">
-										  <strong>Question:</strong> {question}
-									  </p>
-								  </div>
-							  )}
-						  </div>
-					  )}
-				  </>
-			  )
-		  )}
+										{error && (
+											<p className="text-red-500 text-sm mt-2">{error}</p>
+										)}
+										<div className="mt-3 flex justify-end">
+											<button
+												className={`px-4 py-1 text-sm text-black rounded-md transition ${loading
+														? 'bg-gray-400 cursor-not-allowed'
+														: 'bg-[#C7E576] hover:opacity-80'
+													}`}
+												onClick={handleSubmit}
+												disabled={loading}
+											>
+												{loading ? 'Submitting...' : 'Submit'}
+											</button>
+										</div>
+									</>
+								) : (
+									<div className="text-center">
+										<p className="text-sm text-gray-600">
+											Thank you! Your question has been submitted.
+										</p>
+										<p className="mt-2">
+											<strong>Email:</strong> {email}
+										</p>
+										<p className="mt-1">
+											<strong>Question:</strong> {question}
+										</p>
+									</div>
+								)}
+							</div>
+						)}
+          </>
+        )
+      )}
     </div>
   );
 };
