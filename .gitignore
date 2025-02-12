@@ -53,7 +53,17 @@ next-env.d.ts
 #Jetbrains
 .idea/*
 
+# npmrc
+.npmrc
 
+# dist
+dist/
+
+# node_modules
+node_modules/
+
+# log files
+*.log
 
 apps/svendio-backend/
 apps/svendio-frontend/

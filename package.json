@@ -1,24 +1,37 @@
 {
   "name": "entelligence-chat",
-  "private": true,
-  "version": "0.0.0",
-  "type": "commonjs",
+  "version": "1.0.0",
+  "private": false,
+  "description": "Entelligence Chat Widget",
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/entelligence-chat.git"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "build": "vite build && vite build --mode react && tsc",
+    "prepublishOnly": "npm run build",
+    "publish": "npm publish --access public"
   },
   "dependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
     "react-icons": "^5.4.0",
     "vite-plugin-css-injected-by-js": "^3.5.1"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
   },
   "devDependencies": {
     "@assistant-ui/react": "^0.5.27",
     "@assistant-ui/react-markdown": "^0.2.8",
     "@assistant-ui/react-syntax-highlighter": "^0.0.8",
+    "@babel/preset-react": "^7.26.3",
     "@eslint/js": "^9.8.0",
     "@types/node": "^22.2.0",
     "@types/react": "^18.3.3",
@@ -26,6 +39,7 @@
     "@types/react-syntax-highlighter": "^15.5.13",
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.20",
+    "babel-plugin-transform-remove-console": "^6.9.4",
     "eslint": "^9.8.0",
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.9",
@@ -39,5 +53,12 @@
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.0",
     "vite": "^5.4.0"
+  },
+  "main": "dist/vanilla/entelligence-chat.js",
+  "module": "dist/vanilla/entelligence-chat.js",
+  "types": "dist/types/index.d.ts",
+  "exports": {
+    ".": "./dist/vanilla/entelligence-chat.js",
+    "./react": "./dist/react/entelligence-chat-react.js"
   }
 }

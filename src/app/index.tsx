@@ -75,7 +75,7 @@ const MarkdownText = makeMarkdownText({
     },
 });
 
-const MyCustomAdapter = ({ apiKey, repoName, organization, numQuestions, setNumQuestions }: AnalyticsData) => {
+const MyCustomAdapter = ({ apiKey, repoName, organization, setNumQuestions }: AnalyticsData) => {
     return {
         async* run({messages, abortSignal}: { messages: any, abortSignal: AbortSignal}) {
             const { content: question, role } = messages.pop()!;
