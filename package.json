@@ -26,6 +26,9 @@
   },
   "dependencies": {
     "@assistant-ui/react-markdown": "^0.7.20",
+    "@assistant-ui/react-ui": "^0.1.7",
+    "@assistant-ui/react-syntax-highlighter": "^0.7.10",
+    "@assistant-ui/react": "^0.7.77",
     "react-icons": "^5.4.0",
     "vite-plugin-css-injected-by-js": "^3.5.1",
     "vite-plugin-dts": "^4.5.0"
@@ -35,9 +38,7 @@
     "react-dom": "^18.0.0",
     "tailwindcss": "^3.4.9"
   },
-  "devDependencies": {
-    "@assistant-ui/react": "^0.7.77",
-    "@assistant-ui/react-syntax-highlighter": "^0.7.10",
+  "devDependencies": {        
     "@babel/preset-react": "^7.26.3",
     "@eslint/js": "^9.8.0",
     "@types/node": "^22.2.0",

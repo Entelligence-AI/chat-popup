@@ -14,12 +14,14 @@ if (import.meta.env.DEV) {
 
   const analyticsData: InitType['analyticsData'] = {
     apiKey: "test-api-key",
-    repoName: "test-repo",
-    organization: "test-org",
-    theme: "dark",
+    repoName: "chat-popup",
+    organization: "Entelligence-AI",
+    theme: "light",
     numQuestions: 0,
     setNumQuestions: () => {}
   };
+
+  document.body.classList.add(analyticsData?.theme || 'light');
 
   const root = createRoot(rootElement);
   

@@ -1,29 +1,58 @@
+import React, { useCallback } from 'react';
 import { FC, useEffect, useState } from 'react';
 import {
-  AssistantModal,
   AssistantModalPrimitive,
   ChatModelAdapter,
-  useLocalRuntime,
-  Thread,
-  Composer,
-  ThreadWelcome,
-  type ThreadConfig,
+  useLocalRuntime,    
+  type ThreadMessage,
   useThread,
 } from '@assistant-ui/react';
-import { makeMarkdownText } from '@assistant-ui/react-markdown';
+import {
+  Thread,
+  Composer,
+  AssistantModal,
+  makeMarkdownText,
+  ThreadWelcome,
+  type ThreadConfig,
+} from '@assistant-ui/react-ui';
 import { makePrismAsyncSyntaxHighlighter } from '@assistant-ui/react-syntax-highlighter';
 import { coldarkDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import remarkGfm from 'remark-gfm';
 import { FaSlack } from 'react-icons/fa';
 import { IoClose } from 'react-icons/io5';
-import { createRoot } from 'react-dom/client';
 
-import '@assistant-ui/react-markdown/styles/tailwindcss/markdown.css';
+import '@assistant-ui/react-markdown/styles/markdown.css';
 import '@assistant-ui/react/styles/index.css';
 import '@assistant-ui/react/styles/modal.css';
 
 import { AnalyticsData } from '@/types';
 import { usePostHog } from 'posthog-js/react';
+
+class ChatErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="p-4 text-red-500">
+          Something went wrong with the chat. Please try refreshing the page.
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 
 export const App = ({
   apiKey,
@@ -45,13 +74,16 @@ export const App = ({
   return (
     <div className={theme}>
       {apiKey && (
-        <DocsChat
-          apiKey={apiKey}
-          organization={organization}
-          repoName={repoName}
-          numQuestions={numQuestions}
-          setNumQuestions={setNumQuestions}
-        />
+        <ChatErrorBoundary>        
+          <DocsChat
+            apiKey={apiKey}
+            organization={organization}
+            repoName={repoName}
+            numQuestions={numQuestions}
+            setNumQuestions={setNumQuestions}
+            theme={theme}
+          />
+        </ChatErrorBoundary>
       )}
     </div>
   );
@@ -84,7 +116,7 @@ const SyntaxHighlighter = makePrismAsyncSyntaxHighlighter({
 const MarkdownText = makeMarkdownText({
   remarkPlugins: [remarkGfm],
   components: {
-    SyntaxHighlighter,
+    SyntaxHighlighter: SyntaxHighlighter as any,
   },
 });
 
@@ -92,51 +124,51 @@ const MyCustomAdapter = ({
   apiKey,
   repoName,
   organization,
-  setNumQuestions,
-}: AnalyticsData) => {
-  return {
-    async *run({
-      messages,
-      abortSignal,
-    }: {
-      messages: any;
-      abortSignal: AbortSignal;
-    }) {
-      const { content: question, role } = messages.pop()!;
-      if (role !== 'user' || !question) throw new Error('No question provided');
+}: AnalyticsData) => ({
+  async *run({
+    messages,
+    abortSignal,
+  }: {
+    messages: readonly ThreadMessage[];
+    abortSignal: AbortSignal;
+  }) {
+    const messagesToSend = messages.map((m) => ({
+      role: m.role,
+      content: m.content
+        .filter((c) => c.type === 'text')
+        .map((c) => c.text)
+        .join(' '),
+    }));
 
-      if (setNumQuestions) setNumQuestions((numQuestions) => numQuestions + 1);
-
-      const response = await fetch(
-        'https://entelligence.ddbrief.com/repositoryAgent/',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${apiKey}`,
-          },
-          body: JSON.stringify({
-            question: question[0]?.text,
-            history: [],
-            vectorDBUrl: `${organization}&${repoName}`,
-            enableArtifacts: false,
-            advancedAgent: false,
-            limitSources: 3,
-          }),
-          signal: abortSignal,
-        }
-      );
-
-      let text = '';
-      for await (const chunk of asAsyncIterable<any>(
-        response.body!.pipeThrough(new TextDecoderStream())
-      )) {
-        text += chunk;
-        yield { content: [{ type: 'text', text }] };
+    const response = await fetch(
+      'https://entelligence.ddbrief.com/repositoryAgent/',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          question: messagesToSend.at(-1)?.content,
+          history: [],
+          vectorDBUrl: `${organization}&${repoName}`,
+          enableArtifacts: false,
+          advancedAgent: false,
+          limitSources: 3,
+        }),
+        signal: abortSignal,
       }
-    },
-  };
-};
+    );
+
+    let text = '';
+    for await (const chunk of asAsyncIterable(
+      response.body!.pipeThrough(new TextDecoderStream())
+    )) {
+      text += chunk;
+      yield { content: [{ type: 'text', text }] };
+    }
+  },
+});
 
 export const DocsChat = ({
   repoName,
@@ -144,6 +176,7 @@ export const DocsChat = ({
   apiKey,
   setNumQuestions,
   numQuestions,
+  theme,
 }: AnalyticsData) => {
   const adapter = MyCustomAdapter({
     apiKey,
@@ -153,7 +186,6 @@ export const DocsChat = ({
     setNumQuestions,
   });
   const runtime = useLocalRuntime(adapter as ChatModelAdapter);
-
   return (
     <MyAssistantModal
       runtime={runtime}
@@ -166,6 +198,7 @@ export const DocsChat = ({
       apiKey={apiKey}
       numQuestions={numQuestions}
       setNumQuestions={setNumQuestions}
+      theme={theme}
     />
   );
 };
@@ -173,43 +206,27 @@ export const DocsChat = ({
 const MyAssistantModal: FC<ThreadConfig & AnalyticsData> = (config) => {
   return (
     <AssistantModal.Root config={config}>
-      <MyAssistantModalTrigger
-        apiKey={config.apiKey}
-        repoName={config.repoName}
-        organization={config.organization}
-        numQuestions={config.numQuestions}
-        setNumQuestions={config.setNumQuestions}
-      />
-      <AssistantModal.Content style={{ width: '600px', height: '620px' }}>
+      <MyAssistantModalTrigger theme={config.theme} />
+      <AssistantModal.Content className="h-[620px] w-[600px]">
         <MyThread
           numQuestions={config.numQuestions}
           vectorDBUrl={`${config.organization}&${config.repoName}`}
           apiKey={config.apiKey}
+          setNumQuestions={config.setNumQuestions}
+          theme={config.theme}
         />
       </AssistantModal.Content>
     </AssistantModal.Root>
   );
 };
 
-const MyAssistantModalTrigger: FC<AnalyticsData> = ({
-  repoName,
-  organization,
-  apiKey,
-}) => {
-  const posthog = usePostHog();
-
+const MyAssistantModalTrigger: FC<{ theme?: string }> = ({ theme = 'light' }) => {
   return (
     <AssistantModal.Anchor className="hidden md:block">
       <AssistantModalPrimitive.Trigger asChild>
-        <AssistantModal.Button
-          onClick={() =>
-            posthog?.capture('chat_opened', {
-              apiKey,
-              repoName,
-              organization,
-            })
-          }
-        />
+        <AssistantModal.Button>
+          <ChatIcon theme={theme} />
+        </AssistantModal.Button>
       </AssistantModalPrimitive.Trigger>
     </AssistantModal.Anchor>
   );
@@ -421,26 +438,36 @@ const MyThread: FC<{
   numQuestions: number;
   apiKey: string;
   vectorDBUrl: string;
-}> = ({ numQuestions, apiKey, vectorDBUrl }) => {
-  const thread = useThread();
-  const messages = thread.messages;
+  theme?: string;
+  setNumQuestions?: (n: number) => void;
+}> = ({ numQuestions, apiKey, vectorDBUrl, setNumQuestions, theme = 'light' }) => {
+    const messages = useThread((t) => t.messages);
+    
+    const chatHist = messages
+      .map((message: ThreadMessage) => {
+        const text = message.content
+          ?.filter((c) => 'text' in c)
+          ?.map((c) => ('text' in c ? c.text : ''))
+          .join(' ');
+        return message.role === 'user' ? `*Question:* ${text}` : `*Ans:* ${text}`;
+      })
+      .join('\n\n');
 
-  const chatHist = messages
-    .map(({ role, content }) => {
-      const text = content
-        ?.map((c) => (c.type === 'text' ? c.text : ''))
-        .join(' ');
-      return role === 'user' ? `*Question:* ${text}` : `*Ans:* ${text}`;
-    })
-    .join('\n\n');
+    const updateNumQuestions = useCallback(() => {
+      if (setNumQuestions && messages?.length > 0) {
+        setNumQuestions(Math.floor(messages.length / 2));
+      }
+    }, [messages?.length, setNumQuestions]);
+
+    useEffect(() => {
+      updateNumQuestions();
+    }, [updateNumQuestions]);
 
   return (
     <Thread.Root className="flex flex-col">
       <Thread.Viewport>
         <ThreadWelcome />
-
         <Thread.Messages />
-
         <OssSlack
           numQuestions={numQuestions}
           apiKey={apiKey}
@@ -457,82 +484,93 @@ const MyThread: FC<{
         href="https://entelligence.ai"
         className="text-muted-foreground flex w-full items-center justify-center gap-2 border-t py-2 text-xs"
       >
-        In partnership with{' '}
-        <span className="flex items-center gap-2">
-          <svg
-            width="34"
-            height="34"
-            viewBox="0 0 34 34"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <g filter="url(#filter0_dd_932_2270)">
-              <path
-                fill-rule="evenodd"
-                clip-rule="evenodd"
-                d="M32.2625 12.463C32.3444 12.8243 32.0637 13.1597 31.6933 13.1597H25.9438C24.7036 9.20076 21.0066 6.32829 16.6387 6.32829C12.2708 6.32829 8.57374 9.20076 7.33357 13.1597H1.58355C1.21316 13.1597 0.932391 12.8243 1.01429 12.463C2.63221 5.32729 9.01318 0 16.6384 0C24.2636 0 30.6446 5.32729 32.2625 12.463ZM7.29862 18.8814C7.03244 17.9934 6.88943 17.0522 6.88943 16.0776C6.88943 15.0611 7.04498 14.081 7.33357 13.1597H25.9438C26.2324 14.081 26.3879 15.0611 26.3879 16.0776C26.3879 17.0522 26.2449 17.9934 25.9788 18.8814H7.29862ZM16.078 26.3725C16.078 26.0574 15.8313 25.799 15.5182 25.7632C11.6072 25.3156 8.39949 22.5539 7.29862 18.8814H1.58355C1.21316 18.8814 0.932391 19.2168 1.01429 19.5781C2.54837 26.344 8.36465 31.4841 15.4635 31.9987C15.7988 32.023 16.078 31.7527 16.078 31.4165V26.3725ZM25.9788 18.8814C25.9788 18.8814 25.9787 18.8814 25.9788 18.8814H31.6933C31.6959 18.8814 31.6985 18.8814 31.7011 18.8814H25.9788Z"
-                fill="#D3F674"
-              />
-            </g>
-            <defs>
-              <filter
-                id="filter0_dd_932_2270"
-                x="0.263188"
-                y="0"
-                width="32.751"
-                height="33.4739"
-                filterUnits="userSpaceOnUse"
-                color-interpolation-filters="sRGB"
-              >
-                <feFlood flood-opacity="0" result="BackgroundImageFix" />
-                <feColorMatrix
-                  in="SourceAlpha"
-                  type="matrix"
-                  values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
-                  result="hardAlpha"
-                />
-                <feOffset dy="0.736812" />
-                <feGaussianBlur stdDeviation="0.368406" />
-                <feComposite in2="hardAlpha" operator="out" />
-                <feColorMatrix
-                  type="matrix"
-                  values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"
-                />
-                <feBlend
-                  mode="normal"
-                  in2="BackgroundImageFix"
-                  result="effect1_dropShadow_932_2270"
-                />
-                <feColorMatrix
-                  in="SourceAlpha"
-                  type="matrix"
-                  values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
-                  result="hardAlpha"
-                />
-                <feOffset dy="0.650823" />
-                <feGaussianBlur stdDeviation="0.113894" />
-                <feComposite in2="hardAlpha" operator="out" />
-                <feColorMatrix
-                  type="matrix"
-                  values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0"
-                />
-                <feBlend
-                  mode="normal"
-                  in2="effect1_dropShadow_932_2270"
-                  result="effect2_dropShadow_932_2270"
-                />
-                <feBlend
-                  mode="normal"
-                  in="SourceGraphic"
-                  in2="effect2_dropShadow_932_2270"
-                  result="shape"
-                />
-              </filter>
-            </defs>
-          </svg>
-          Entelligence
-        </span>
+        In partnership with <ChatIcon width={16} height={16} theme={theme === 'light' ? 'dark' : 'light'} />{' '}
+        <span className="flex items-center gap-2">Entelligence</span>
       </a>
     </Thread.Root>
+  );
+};
+
+const ChatIcon = ({
+  width,
+  height,
+  theme,
+}: {
+  width?: number;
+  height?: number;
+  theme?: string;
+}) => {
+  return (
+    <svg
+      width={width ?? 34}
+      height={height ?? 34}
+      viewBox="0 0 34 34"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <g filter="url(#filter0_dd_932_2270)">
+        <path
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M32.2625 12.463C32.3444 12.8243 32.0637 13.1597 31.6933 13.1597H25.9438C24.7036 9.20076 21.0066 6.32829 16.6387 6.32829C12.2708 6.32829 8.57374 9.20076 7.33357 13.1597H1.58355C1.21316 13.1597 0.932391 12.8243 1.01429 12.463C2.63221 5.32729 9.01318 0 16.6384 0C24.2636 0 30.6446 5.32729 32.2625 12.463ZM7.29862 18.8814C7.03244 17.9934 6.88943 17.0522 6.88943 16.0776C6.88943 15.0611 7.04498 14.081 7.33357 13.1597H25.9438C26.2324 14.081 26.3879 15.0611 26.3879 16.0776C26.3879 17.0522 26.2449 17.9934 25.9788 18.8814H7.29862ZM16.078 26.3725C16.078 26.0574 15.8313 25.799 15.5182 25.7632C11.6072 25.3156 8.39949 22.5539 7.29862 18.8814H1.58355C1.21316 18.8814 0.932391 19.2168 1.01429 19.5781C2.54837 26.344 8.36465 31.4841 15.4635 31.9987C15.7988 32.023 16.078 31.7527 16.078 31.4165V26.3725ZM25.9788 18.8814C25.9788 18.8814 25.9787 18.8814 25.9788 18.8814H31.6933C31.6959 18.8814 31.6985 18.8814 31.7011 18.8814H25.9788Z"
+          fill={theme === 'dark' ? 'black' : '#D3F674'}
+        />
+      </g>
+      <defs>
+        <filter
+          id="filter0_dd_932_2270"
+          x="0.263188"
+          y="0"
+          width="32.751"
+          height="33.4739"
+          filterUnits="userSpaceOnUse"
+          colorInterpolationFilters="sRGB"
+        >
+          <feFlood floodOpacity="0" result="BackgroundImageFix" />
+          <feColorMatrix
+            in="SourceAlpha"
+            type="matrix"
+            values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+            result="hardAlpha"
+          />
+          <feOffset dy="0.736812" />
+          <feGaussianBlur stdDeviation="0.368406" />
+          <feComposite in2="hardAlpha" operator="out" />
+          <feColorMatrix
+            type="matrix"
+            values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"
+          />
+          <feBlend
+            mode="normal"
+            in2="BackgroundImageFix"
+            result="effect1_dropShadow_932_2270"
+          />
+          <feColorMatrix
+            in="SourceAlpha"
+            type="matrix"
+            values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+            result="hardAlpha"
+          />
+          <feOffset dy="0.650823" />
+          <feGaussianBlur stdDeviation="0.113894" />
+          <feComposite in2="hardAlpha" operator="out" />
+          <feColorMatrix
+            type="matrix"
+            values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0"
+          />
+          <feBlend
+            mode="normal"
+            in2="effect1_dropShadow_932_2270"
+            result="effect2_dropShadow_932_2270"
+          />
+          <feBlend
+            mode="normal"
+            in="SourceGraphic"
+            in2="effect2_dropShadow_932_2270"
+            result="shape"
+          />
+        </filter>
+      </defs>
+    </svg>
   );
 };
