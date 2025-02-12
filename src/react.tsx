@@ -11,6 +11,8 @@ export const EntelligenceChat = ({ analyticsData }: InitType) => (
         apiKey='phc_1ttc13N2t7AvMZvzFdJ3ppJ1wJGDuql1nuo4Copgqbu'
         options={options}
     >
-        <App {...analyticsData}/>
+        <div className="entelligence-chat-container">
+            <App {...analyticsData}/>
+        </div>
     </PostHogProvider>
 ); 

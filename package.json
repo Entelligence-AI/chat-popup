@@ -25,18 +25,19 @@
     "publish": "npm publish --access public"
   },
   "dependencies": {
-    "@assistant-ui/react-markdown": "^0.2.8",
+    "@assistant-ui/react-markdown": "^0.7.20",
     "react-icons": "^5.4.0",
     "vite-plugin-css-injected-by-js": "^3.5.1",
     "vite-plugin-dts": "^4.5.0"
   },
   "peerDependencies": {
     "react": "^18.0.0",
-    "react-dom": "^18.0.0"
+    "react-dom": "^18.0.0",
+    "tailwindcss": "^3.4.9"
   },
   "devDependencies": {
-    "@assistant-ui/react": "^0.5.27",
-    "@assistant-ui/react-syntax-highlighter": "^0.0.8",
+    "@assistant-ui/react": "^0.7.77",
+    "@assistant-ui/react-syntax-highlighter": "^0.7.10",
     "@babel/preset-react": "^7.26.3",
     "@eslint/js": "^9.8.0",
     "@types/node": "^22.2.0",
@@ -76,8 +77,8 @@
       "require": "./dist/react/entelligence-chat-react.umd.js"
     },
     "./style.css": {
-      "import": "./dist/react/index.css",
-      "require": "./dist/react/index.css"
+      "import": "./dist/react/style.css",
+      "require": "./dist/react/style.css"
     }
   },
   "typesVersions": {

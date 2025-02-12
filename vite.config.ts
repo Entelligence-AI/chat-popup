@@ -1,4 +1,4 @@
-import {defineConfig, UserConfig} from 'vite'
+import { defineConfig, UserConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import cssInjectedByJsPlugin from "vite-plugin-css-injected-by-js"
 import { resolve } from 'path'
@@ -8,9 +8,14 @@ import dts from 'vite-plugin-dts'
 export default defineConfig(({ mode }) => {
   const isReactBuild = mode === 'react'
   
-  return {
+  const config = {
     define: {
-      'process.env.NODE_ENV': '"production"'
+      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
+    },
+    resolve: {
+      alias: {
+        '@': resolve(__dirname, './src')
+      }
     },
     build: {
       minify: 'esbuild',
@@ -30,10 +35,6 @@ export default defineConfig(({ mode }) => {
             'react': 'React',
             'react-dom': 'ReactDOM',
             'react/jsx-runtime': 'ReactJSXRuntime'
-          },
-          assetFileNames: (assetInfo) => {
-            if (assetInfo.name === 'style.css') return 'index.css';
-            return assetInfo.name;
           }
         }
       },
@@ -45,32 +46,34 @@ export default defineConfig(({ mode }) => {
       }
     },
     optimizeDeps: {
-      include: ['@assistant-ui/react-markdown/styles/tailwindcss/markdown.css']
+      include: ['@assistant-ui/react-markdown']
     },
     plugins: [
-      react(),
+      react({
+        jsxRuntime: 'automatic',
+      }),
       dts({
         include: ['src'],
         exclude: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
         outDir: 'dist/types',
         rollupTypes: true
       }),
-      !isReactBuild && cssInjectedByJsPlugin({
-        topExecutionPriority: false,
-        styleId: 'entelligence-chat-styles',
-        injectCode: (cssText) => `
-          (function() {
-            if (typeof document === 'undefined') return;
-            const id = 'entelligence-chat-styles';
-            if (!document.getElementById(id)) {
-              const style = document.createElement('style');
-              style.id = id;
-              style.textContent = ${cssText};
-              document.head.appendChild(style);
-            }
-          })();
-        `
-      })
-    ].filter(Boolean)
+      !isReactBuild && cssInjectedByJsPlugin()
+    ].filter(Boolean),
+    server: {
+      port: 5173,
+      open: true,
+      host: true,
+      hmr: {
+        overlay: true
+      }
+    }
   } as UserConfig
+
+  if (!isReactBuild) {
+    delete config.build?.lib
+    delete config.build?.rollupOptions
+  }
+
+  return config
 })
