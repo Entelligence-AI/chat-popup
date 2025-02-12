@@ -1,13 +1,16 @@
 {
-  "name": "entelligence-chat",
-  "version": "1.0.0",
+  "name": "@entelligence-ai/chat-widget",
+  "version": "0.0.1",
   "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "Entelligence Chat Widget",
   "author": "Your Name",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yourusername/entelligence-chat.git"
+    "url": "git+https://github.com/Entelligence-AI/chat-popup"
   },
   "files": [
     "dist",
