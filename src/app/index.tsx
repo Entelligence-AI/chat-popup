@@ -358,12 +358,15 @@ const MyThread:  FC<{ numQuestions: number; apiKey: string; vectorDBUrl: string 
 	const { useThreadMessages } = useThreadContext();
 	const messages = useThreadMessages();
 
-	const chatHist = messages.map(({ role, content }) => {
-        const text = content?.map((c) => (c.type === "text" ? c.text : "")).join(" ");
-        return role === "user"
-            ? `*Question:* ${text}`
-            : `*Ans:* ${text}`;
-    }).join("\n\n");
+	const chatHist = messages
+		.slice(-6)
+		.map(({ role, content }) => {
+			const text = content
+				?.map((c) => (c.type === 'text' ? c.text : ''))
+				.join(' ');
+      return role === 'user' ? `*Question:* ${text}` : `*Ans:* ${text}`;
+    })
+    .join('\n\n');
 
     return (
         <Thread.Root className="flex flex-col">
