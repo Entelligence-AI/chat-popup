@@ -25,7 +25,7 @@ import {AnalyticsData} from "@/types";
 import {usePostHog} from "posthog-js/react";
 
 
-export const App = ({ apiKey, repoName, organization }: AnalyticsData) => {
+export const App = ({ apiKey, repoName, organization, theme }: AnalyticsData) => {
     const posthog = usePostHog();
 	const [numQuestions, setNumQuestions] = useState(0);
 
@@ -38,7 +38,7 @@ export const App = ({ apiKey, repoName, organization }: AnalyticsData) => {
     }, [apiKey, repoName, organization]);
 
     return (
-        <div>
+        <div className={theme}>
             { apiKey && <DocsChat apiKey={apiKey} organization={organization} repoName={repoName} numQuestions={numQuestions} setNumQuestions={setNumQuestions}/>}
         </div>
     );

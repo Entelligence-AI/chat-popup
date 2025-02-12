@@ -14,7 +14,8 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "package.json"
   ],
   "scripts": {
     "dev": "vite",
@@ -23,8 +24,10 @@
     "publish": "npm publish --access public"
   },
   "dependencies": {
+    "@assistant-ui/react-markdown": "^0.2.8",
     "react-icons": "^5.4.0",
-    "vite-plugin-css-injected-by-js": "^3.5.1"
+    "vite-plugin-css-injected-by-js": "^3.5.1",
+    "vite-plugin-dts": "^4.5.0"
   },
   "peerDependencies": {
     "react": "^18.0.0",
@@ -32,7 +35,6 @@
   },
   "devDependencies": {
     "@assistant-ui/react": "^0.5.27",
-    "@assistant-ui/react-markdown": "^0.2.8",
     "@assistant-ui/react-syntax-highlighter": "^0.0.8",
     "@babel/preset-react": "^7.26.3",
     "@eslint/js": "^9.8.0",
@@ -57,11 +59,29 @@
     "typescript-eslint": "^8.0.0",
     "vite": "^5.4.0"
   },
-  "main": "dist/vanilla/entelligence-chat.js",
-  "module": "dist/vanilla/entelligence-chat.js",
-  "types": "dist/types/index.d.ts",
+  "main": "./dist/vanilla/entelligence-chat.umd.js",
+  "module": "./dist/vanilla/entelligence-chat.es.js",
+  "types": "./dist/types/main.d.ts",
   "exports": {
-    ".": "./dist/vanilla/entelligence-chat.js",
-    "./react": "./dist/react/entelligence-chat-react.js"
+    ".": {
+      "types": "./dist/types/main-vanilla.d.ts",
+      "import": "./dist/vanilla/entelligence-chat.es.js",
+      "require": "./dist/vanilla/entelligence-chat.umd.js"
+    },
+    "./react": {
+      "types": "./dist/types/react.d.ts",
+      "import": "./dist/react/entelligence-chat-react.es.js",
+      "require": "./dist/react/entelligence-chat-react.umd.js"
+    },
+    "./style.css": {
+      "import": "./dist/react/index.css",
+      "require": "./dist/react/index.css"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "react": ["./dist/types/react.d.ts"],
+      "*": ["./dist/types/main-vanilla.d.ts"]
+    }
   }
 }

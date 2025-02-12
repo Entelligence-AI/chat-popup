@@ -12,7 +12,7 @@ export const init = ({ analyticsData }: InitType) => {
     root.render(<EntelligenceChat analyticsData={analyticsData} />);
 };
 
-// For vanilla JS usage
-(window as any).EntelligenceChat = { init };
-export { init as EntelligenceChat };
+export { init as EntelligenceChatInit };
+export { EntelligenceChat } from './react';
+export type { InitType } from './types';
 
