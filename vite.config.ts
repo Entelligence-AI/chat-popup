@@ -49,14 +49,13 @@ export default defineConfig(({ mode }) => {
       include: ['@assistant-ui/react-markdown']
     },
     plugins: [
-      react({
-        jsxRuntime: 'automatic',
-      }),
+      react(),
       dts({
         include: ['src'],
         exclude: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
-        outDir: 'dist/types',
-        rollupTypes: true
+        outDir: isReactBuild ? 'dist/types/react' : 'dist/types',
+        rollupTypes: true,
+        insertTypesEntry: true,             
       }),
       !isReactBuild && cssInjectedByJsPlugin()
     ].filter(Boolean),
@@ -69,11 +68,6 @@ export default defineConfig(({ mode }) => {
       }
     }
   } as UserConfig
-
-  if (!isReactBuild) {
-    delete config.build?.lib
-    delete config.build?.rollupOptions
-  }
 
   return config
 })

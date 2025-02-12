@@ -19,7 +19,7 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "vite build && vite build --mode react && tsc",
+    "build": "vite build && vite build --mode react && tsc --emitDeclarationOnly --outDir dist/types",
     "version:update": "ts-node scripts/version-update.ts",
     "prepublishOnly": "npm run version:update && npm run build",
     "publish": "npm publish --access public"
@@ -68,12 +68,12 @@
   "types": "./dist/types/main.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/types/main-vanilla.d.ts",
+      "types": "./dist/types/main.d.ts",
       "import": "./dist/vanilla/entelligence-chat.es.js",
       "require": "./dist/vanilla/entelligence-chat.umd.js"
     },
     "./react": {
-      "types": "./dist/types/react.d.ts",
+      "types": "./dist/types/react/index.d.ts",
       "import": "./dist/react/entelligence-chat-react.es.js",
       "require": "./dist/react/entelligence-chat-react.umd.js"
     },
@@ -85,7 +85,7 @@
   "typesVersions": {
     "*": {
       "react": [
-        "./dist/types/react.d.ts"
+        "./dist/types/react/index.d.ts"
       ],
       "*": [
         "./dist/types/main-vanilla.d.ts"
