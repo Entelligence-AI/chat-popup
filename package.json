@@ -1,9 +1,10 @@
 {
   "name": "@entelligence-ai/chat-widget",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "private": false,
   "publishConfig": {
-    "access": "public"
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com"
   },
   "description": "Entelligence Chat Widget",
   "author": "Your Name",
