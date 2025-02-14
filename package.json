@@ -3,7 +3,7 @@
   "version": "0.0.6",
   "private": false,
   "publishConfig": {
-    "access": "public",
+    "access": "restricted",
     "registry": "https://npm.pkg.github.com"
   },
   "description": "Entelligence Chat Widget",
