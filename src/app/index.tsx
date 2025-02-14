@@ -299,7 +299,7 @@ const OssSlack: FC<{
   numQuestions: number;
   apiKey: string;
   vectorDBUrl: string;
-  chatHist: string;
+  chatHist: Array<{ question: string; answer: string }>;
 }> = ({ numQuestions, apiKey, vectorDBUrl, chatHist }) => {
   const [showForm, setShowForm] = useState(false);
   const [email, setEmail] = useState('');
@@ -329,7 +329,7 @@ const OssSlack: FC<{
     const result = await sendSlackQuery(
       apiKey,
       vectorDBUrl,
-      chatHist,
+	  JSON.stringify(chatHist),
       question,
       email
     );
@@ -443,15 +443,28 @@ const MyThread: FC<{
 }> = ({ numQuestions, apiKey, vectorDBUrl, setNumQuestions, theme = 'light' }) => {
     const messages = useThread((t) => t.messages);
     
-    const chatHist = messages
-      .map((message: ThreadMessage) => {
-        const text = message.content
-          ?.filter((c) => 'text' in c)
-          ?.map((c) => ('text' in c ? c.text : ''))
-          .join(' ');
-        return message.role === 'user' ? `*Question:* ${text}` : `*Ans:* ${text}`;
-      })
-      .join('\n\n');
+	const lastThreeQA = [];
+	const reversedMessages = [...messages].reverse();
+	let currentPair: { question?: string; answer?: string } = {};
+
+	for (const message of reversedMessages.reverse()) {
+		const text = message.content
+			?.map((c) => (c.type === 'text' ? c.text : ''))
+			.join(' ');
+
+		if (message.role === 'assistant' && currentPair.question) {
+			currentPair.answer = text;
+			lastThreeQA.push(currentPair);
+			currentPair = {};
+		} else if (message.role === 'user') {
+			currentPair.question = text;
+		}
+		if (lastThreeQA.length >= 3) break;
+	}
+	const chatHist = lastThreeQA.map((pair) => ({
+		question: pair.question ?? '',
+		answer: pair.answer ?? '',
+	}));
 
     const updateNumQuestions = useCallback(() => {
       if (setNumQuestions && messages?.length > 0) {
