@@ -300,7 +300,18 @@ const OssSlack: FC<{
   apiKey: string;
   vectorDBUrl: string;
   chatHist: Array<{ question: string; answer: string }>;
-}> = ({ numQuestions, apiKey, vectorDBUrl, chatHist }) => {
+  theme?: string;
+}> = ({ numQuestions, apiKey, vectorDBUrl, chatHist, theme = "light" }) => {
+
+  const validTheme = theme === "dark" ? "dark" : "light";
+  const isDark = validTheme === "dark";
+
+  const bgColor = isDark ? "bg-[#1f1f26]" : "bg-white";
+  const textColor = isDark ? "text-gray-300" : "text-gray-800";
+  const borderColor = isDark ? "border-[#4a4a4f]" : "border-gray-300";
+  const buttonBgColor = isDark ? "bg-[#C7E576] text-gray-900" : "bg-[#C7E576] text-black";
+  const hoverEffect = isDark ? "hover:opacity-80" : "hover:opacity-90";
+
   const [showForm, setShowForm] = useState(false);
   const [email, setEmail] = useState('');
   const [question, setQuestion] = useState('');
@@ -343,7 +354,7 @@ const OssSlack: FC<{
   };
 
   return (
-    <div className="flex flex-col items-end w-full">
+    <div className={`flex flex-col items-end w-full ${isDark ? "dark" : ""}`}>
       {!allowed ? (
         <div></div>
       ) : (
@@ -351,20 +362,18 @@ const OssSlack: FC<{
           <>
             {!showForm ? (
               <button
-                className="mt-4 p-2 rounded-md shadow-md hover:opacity-80 transition relative group flex items-center gap-2"
+                className={`mt-4 p-3 border ${borderColor} rounded-lg shadow-md ${hoverEffect} transition flex items-center gap-2 ${bgColor} ${textColor}`}
                 onClick={() => setShowForm(true)}
               >
                 <span className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-[#3c3c3c]">
-                    Reach Owners on Slack
-                  </span>
+                  <span className="text-sm font-medium">Reach Owners on Slack</span>
                   <FaSlack size={24} className="text-[#c7e576]" />
                 </span>
               </button>
             ) : (
-              <div className="mt-4 p-3 border border-gray-300 rounded-lg shadow-md w-full max-w-sm bg-white relative">
+              <div className={`mt-4 p-3 border ${borderColor} rounded-lg shadow-md w-full max-w-sm ${bgColor} relative`}>
                 <button
-                  className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+                  className={`absolute top-2 right-2 text-gray-500 ${isDark ? "dark:text-gray-400 hover:dark:text-gray-300" : "hover:text-gray-700"}`}
                   onClick={() => setShowForm(false)}
                 >
                   <IoClose size={20} />
@@ -372,7 +381,7 @@ const OssSlack: FC<{
 
                 <div className="flex items-center gap-2 mb-3">
                   <FaSlack size={24} className="text-[#c7e576]" />
-                  <h3 className="text-lg font-semibold text-gray-700">
+                  <h3 className={`text-lg font-semibold ${textColor}`}>
                     Reach Owners on Slack
                   </h3>
                 </div>
@@ -383,28 +392,23 @@ const OssSlack: FC<{
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full p-2 bg-[#f4f4f4] border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                      className={`w-full p-2 bg-transparent border ${borderColor} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 ${textColor} placeholder-gray-500 dark:placeholder-gray-400`}
                       placeholder="Email"
                     />
 
                     <textarea
                       value={question}
                       onChange={(e) => setQuestion(e.target.value)}
-                      className="w-full p-2 mt-3 bg-[#f4f4f4] border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                      className={`w-full p-2 mt-3 bg-transparent border ${borderColor} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 ${textColor} placeholder-gray-500 dark:placeholder-gray-400`}
                       placeholder="Enter your question"
                       rows={3}
                     ></textarea>
 
-                    {error && (
-                      <p className="text-red-500 text-sm mt-2">{error}</p>
-                    )}
+                    {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+
                     <div className="mt-3 flex justify-end">
                       <button
-                        className={`px-4 py-1 text-sm text-black rounded-md transition ${
-                          loading
-                            ? 'bg-gray-400 cursor-not-allowed'
-                            : 'bg-[#C7E576] hover:opacity-80'
-                        }`}
+                        className={`px-4 py-1 text-sm rounded-md transition ${loading ? "bg-gray-400 cursor-not-allowed text-black dark:text-gray-700" : `${buttonBgColor} ${hoverEffect}`}`}
                         onClick={handleSubmit}
                         disabled={loading}
                       >
@@ -413,10 +417,8 @@ const OssSlack: FC<{
                     </div>
                   </>
                 ) : (
-                  <div className="text-center">
-                    <p className="text-sm text-gray-600">
-                      Thank you! Your question has been submitted.
-                    </p>
+                  <div className={`text-center ${textColor}`}>
+                    <p className="text-sm">Thank you! Your question has been submitted.</p>
                     <p className="mt-2">
                       <strong>Email:</strong> {email}
                     </p>
@@ -486,6 +488,7 @@ const MyThread: FC<{
           apiKey={apiKey}
           vectorDBUrl={vectorDBUrl}
           chatHist={chatHist}
+		  theme={theme}
         />
         <Thread.ViewportFooter className="pb-3">
           <Thread.ScrollToBottom />
