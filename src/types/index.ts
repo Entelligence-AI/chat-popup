@@ -3,8 +3,6 @@ export type AnalyticsData = {
     repoName: string;
     organization: string;
     theme?: 'light' | 'dark';
- 	numQuestions: number;
-    setNumQuestions: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export type InitType = {

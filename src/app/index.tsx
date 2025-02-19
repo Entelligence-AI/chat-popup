@@ -61,7 +61,6 @@ export const App = ({
   theme,
 }: AnalyticsData) => {
   const posthog = usePostHog();
-  const [numQuestions, setNumQuestions] = useState(0);
 
   useEffect(() => {
     posthog?.capture('chat_initialized', {
@@ -174,16 +173,12 @@ export const DocsChat = ({
   repoName,
   organization,
   apiKey,
-  setNumQuestions,
-  numQuestions,
   theme,
 }: AnalyticsData) => {
   const adapter = MyCustomAdapter({
     apiKey,
     repoName,
     organization,
-    numQuestions,
-    setNumQuestions,
   });
   const runtime = useLocalRuntime(adapter as ChatModelAdapter);
   return (
@@ -196,8 +191,6 @@ export const DocsChat = ({
       organization={organization}
       repoName={repoName}
       apiKey={apiKey}
-      numQuestions={numQuestions}
-      setNumQuestions={setNumQuestions}
       theme={theme}
     />
   );
@@ -209,10 +202,8 @@ const MyAssistantModal: FC<ThreadConfig & AnalyticsData> = (config) => {
       <MyAssistantModalTrigger theme={config.theme} />
       <AssistantModal.Content className="h-[620px] w-[600px]">
         <MyThread
-          numQuestions={config.numQuestions}
           vectorDBUrl={`${config.organization}&${config.repoName}`}
           apiKey={config.apiKey}
-          setNumQuestions={config.setNumQuestions}
           theme={config.theme}
         />
       </AssistantModal.Content>
@@ -296,12 +287,11 @@ const isOssQueryAllowed = async (
 };
 
 const OssSlack: FC<{
-  numQuestions: number;
   apiKey: string;
   vectorDBUrl: string;
   chatHist: Array<{ question: string; answer: string }>;
   theme?: string;
-}> = ({ numQuestions, apiKey, vectorDBUrl, chatHist, theme = "light" }) => {
+}> = ({ apiKey, vectorDBUrl, chatHist, theme = "light" }) => {
 
   const validTheme = theme === "dark" ? "dark" : "light";
   const isDark = validTheme === "dark";
@@ -358,7 +348,6 @@ const OssSlack: FC<{
       {!allowed ? (
         <div></div>
       ) : (
-        numQuestions >= 3 && (
           <>
             {!showForm ? (
               <button
@@ -430,19 +419,16 @@ const OssSlack: FC<{
               </div>
             )}
           </>
-        )
       )}
     </div>
   );
 };
 
 const MyThread: FC<{
-  numQuestions: number;
   apiKey: string;
   vectorDBUrl: string;
   theme?: string;
-  setNumQuestions?: (n: number) => void;
-}> = ({ numQuestions, apiKey, vectorDBUrl, setNumQuestions, theme = 'light' }) => {
+}> = ({ apiKey, vectorDBUrl, theme = 'light' }) => {
     const messages = useThread((t) => t.messages);
     
 	const lastThreeQA = [];
@@ -468,23 +454,12 @@ const MyThread: FC<{
 		answer: pair.answer ?? '',
 	}));
 
-    const updateNumQuestions = useCallback(() => {
-      if (setNumQuestions && messages?.length > 0) {
-        setNumQuestions(Math.floor(messages.length / 2));
-      }
-    }, [messages?.length, setNumQuestions]);
-
-    useEffect(() => {
-      updateNumQuestions();
-    }, [updateNumQuestions]);
-
   return (
     <Thread.Root className="flex flex-col">
       <Thread.Viewport>
         <ThreadWelcome />
         <Thread.Messages />
         <OssSlack
-          numQuestions={numQuestions}
           apiKey={apiKey}
           vectorDBUrl={vectorDBUrl}
           chatHist={chatHist}
