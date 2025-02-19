@@ -358,7 +358,7 @@ const OssSlack: FC<{
       {!allowed ? (
         <div></div>
       ) : (
-        numQuestions >= 0 && (
+        numQuestions >= 3 && (
           <>
             {!showForm ? (
               <button
