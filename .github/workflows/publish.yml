@@ -14,7 +14,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # Ensure full history for tagging
+          fetch-depth: 0
+          token: ${{ secrets.PAT_TOKEN }}  # Add PAT to checkout
       
       # Setup Git
       - name: Setup Git
@@ -51,9 +52,10 @@ jobs:
           git add package.json package-lock.json CHANGELOG.md
           git commit -m "chore(release): v${{ env.VERSION }}"
           git tag v${{ env.VERSION }}
-          git push origin main --follow-tags --force-with-lease
+          git push origin main --force-with-lease
+          git push origin v${{ env.VERSION }}  # Explicit tag push
         env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}      
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
 
       # Create GitHub Release     
       - name: Generate release notes
