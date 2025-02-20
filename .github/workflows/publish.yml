@@ -15,6 +15,12 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0  # Ensure full history for tagging
+      
+      # Setup Git
+      - name: Setup Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
       # Setup Node.js
       - name: Setup Node.js
@@ -35,9 +41,7 @@ jobs:
 
       # Push updated version, tags, and changelog
       - name: Push version bump and tags
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        run: |         
           git add package.json package-lock.json CHANGELOG.md
           git commit -m "chore(release): v${{ env.VERSION }}"
           git tag v${{ env.VERSION }}
