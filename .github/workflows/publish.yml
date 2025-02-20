@@ -39,17 +39,21 @@ jobs:
           npx standard-version --release-as patch
           echo "VERSION=$(jq -r .version package.json)" >> $GITHUB_ENV
 
+      # Debug remote status
+      - name: Debug remote status
+        run: git remote -v && git status && git log --oneline -n 5
+
       # Push updated version, tags, and changelog
       - name: Push version bump and tags
         run: |    
-          git checkout -B main  # Ensure we're on main branch
-          git pull origin main --rebase  # Rebase instead of merge
+          git checkout -B main
+          git pull origin main --rebase
           git add package.json package-lock.json CHANGELOG.md
           git commit -m "chore(release): v${{ env.VERSION }}"
           git tag v${{ env.VERSION }}
-          git push origin main --follow-tags --atomic  # Atomic ensures all-or-nothing push
+          git push origin main --follow-tags --force-with-lease
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}      
 
       # Create GitHub Release     
       - name: Generate release notes
