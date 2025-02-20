@@ -36,8 +36,8 @@ jobs:
       # Push updated version, tags, and changelog
       - name: Push version bump and tags
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add package.json package-lock.json CHANGELOG.md
           git commit -m "chore(release): v${{ env.VERSION }}"
           git tag v${{ env.VERSION }}
