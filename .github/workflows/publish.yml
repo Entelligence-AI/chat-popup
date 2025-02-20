@@ -42,11 +42,12 @@ jobs:
       # Push updated version, tags, and changelog
       - name: Push version bump and tags
         run: |    
-          git pull origin main
+          git checkout -B main  # Ensure we're on main branch
+          git pull origin main --rebase  # Rebase instead of merge
           git add package.json package-lock.json CHANGELOG.md
           git commit -m "chore(release): v${{ env.VERSION }}"
           git tag v${{ env.VERSION }}
-          git push origin main --follow-tags
+          git push origin main --follow-tags --atomic  # Atomic ensures all-or-nothing push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
