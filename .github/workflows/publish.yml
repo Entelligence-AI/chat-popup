@@ -6,7 +6,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
         with:
           node-version: '18.x'
@@ -14,8 +14,16 @@ jobs:
       - run: npm ci
       - name: Update version
         run: |
-          VERSION=${GITHUB_REF#refs/tags/v}
-          npm version $VERSION --no-git-tag-version
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          IFS='.' read -r -a version_parts <<< "$CURRENT_VERSION"
+          PATCH_VERSION=$((version_parts[2] + 1))
+          NEW_VERSION="${version_parts[0]}.${version_parts[1]}.$PATCH_VERSION"
+          sed -i "s/\"version\": \"$CURRENT_VERSION\"/\"version\": \"$NEW_VERSION\"/" package.json
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "GitHub Actions"
+          git add -A
+          git diff --quiet || (git commit -m "chore: bump version to $NEW_VERSION" && git push)
+          git pull
       - run: npm run build
       - run: npm publish
         env:
