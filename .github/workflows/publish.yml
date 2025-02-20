@@ -41,7 +41,8 @@ jobs:
 
       # Push updated version, tags, and changelog
       - name: Push version bump and tags
-        run: |         
+        run: |    
+          git pull origin main
           git add package.json package-lock.json CHANGELOG.md
           git commit -m "chore(release): v${{ env.VERSION }}"
           git tag v${{ env.VERSION }}
