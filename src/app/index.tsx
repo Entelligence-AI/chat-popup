@@ -78,8 +78,6 @@ export const App = ({
             apiKey={apiKey}
             organization={organization}
             repoName={repoName}
-            numQuestions={numQuestions}
-            setNumQuestions={setNumQuestions}
             theme={theme}
           />
         </ChatErrorBoundary>

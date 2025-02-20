@@ -17,8 +17,6 @@ if (import.meta.env.DEV) {
     repoName: "chat-popup",
     organization: "Entelligence-AI",
     theme: "light",
-    numQuestions: 0,
-    setNumQuestions: () => {}
   };
 
   document.body.classList.add(analyticsData?.theme || 'light');
