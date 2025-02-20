@@ -1,30 +1,72 @@
-name: Publish Package
+name: Release and Publish to NPM
+
 on:
-  release:
-    types: [created]
+  push:
+    branches:
+      - main
+
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v3
+      # Checkout repo
+      - name: Checkout repository
+        uses: actions/checkout@v3
         with:
-          node-version: '18.x'
+          fetch-depth: 0  # Ensure full history for tagging
+
+      # Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
           registry-url: 'https://registry.npmjs.org/'
-      - run: npm ci
-      - name: Update version
+
+      # Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Bump version using standard-version
+      - name: Bump version using standard-version
         run: |
-          CURRENT_VERSION=$(node -p "require('./package.json').version")
-          IFS='.' read -r -a version_parts <<< "$CURRENT_VERSION"
-          PATCH_VERSION=$((version_parts[2] + 1))
-          NEW_VERSION="${version_parts[0]}.${version_parts[1]}.$PATCH_VERSION"
-          sed -i "s/\"version\": \"$CURRENT_VERSION\"/\"version\": \"$NEW_VERSION\"/" package.json
-          git config --global user.email "github-actions@github.com"
-          git config --global user.name "GitHub Actions"
-          git add -A
-          git diff --quiet || (git commit -m "chore: bump version to $NEW_VERSION" && git push)
-          git pull
-      - run: npm run build
-      - run: npm publish
+          npx standard-version --release-as patch
+          echo "VERSION=$(jq -r .version package.json)" >> $GITHUB_ENV
+
+      # Push updated version, tags, and changelog
+      - name: Push version bump and tags
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json CHANGELOG.md
+          git commit -m "chore(release): v${{ env.VERSION }}"
+          git tag v${{ env.VERSION }}
+          git push origin main --follow-tags
         env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Create GitHub Release     
+      - name: Generate release notes
+        id: release_notes
+        run: |
+          git log $(git describe --tags --abbrev=0 2>/dev/null || echo HEAD^)..HEAD --pretty=format:"- %s" > RELEASE_NOTES.md
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+        with:
+          tag_name: v${{ env.VERSION }}
+          release_name: Release v${{ env.VERSION }}
+          body_path: RELEASE_NOTES.md
+          draft: false
+          prerelease: false
+
+      # Publish to NPM
+      - name: Publish to NPM
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # Success message
+      - name: Success message
+        run: echo "🎉 Successfully published v${{ env.VERSION }} to NPM!"
