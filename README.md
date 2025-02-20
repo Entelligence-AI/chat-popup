@@ -2,73 +2,15 @@
 
 A customizable chat widget that provides AI-powered chat functionality based on your repository information. Available for both React and Vanilla JavaScript applications.
 
-## Features
-
-- 🔄 Universal compatibility (React & Vanilla JS)
-- 🎨 Light/Dark theme support
-- 📱 Responsive design
-- ⚡ Lightweight bundle
-- 🛠️ Easy configuration
-- 🔒 TypeScript support
-
 ## Installation
 
 ```bash
-# npm
-npm install @entelligence-ai/chat-widget
-
-# pnpm
-pnpm add @entelligence-ai/chat-widget
-
-# yarn
-yarn add @entelligence-ai/chat-widget
+npm install
 ```
 
-## Usage
-
-### React/Next.js
-```tsx
-import { EntelligenceChat } from '@entelligence-ai/chat-widget/react';
-import '@entelligence-ai/chat-widget/style.css';
-
-function App() {
-  return (
-    <EntelligenceChat 
-      analyticsData={{
-        repoName: "your-repo",
-        organization: "your-org",
-        apiKey: "your-api-key",
-        theme: "light" // or "dark"
-      }} 
-    />
-  );
-}
+```bash
+pnpm install
 ```
-
-### Vanilla JavaScript
-```javascript
-import { EntelligenceChat } from '@entelligence-ai/chat-widget';
-
-EntelligenceChat.init({
-  analyticsData: {
-    repoName: "your-repo",
-    organization: "your-org",
-    apiKey: "your-api-key",
-    theme: "light" // or "dark"
-  }
-});
-```
-
-## Configuration Options
-
-| Option | Type | Required | Default | Description |
-|--------|------|----------|---------|-------------|
-| repoName | string | Yes | - | Your repository name |
-| organization | string | Yes | - | Your organization name |
-| apiKey | string | Yes | - | Your API key |
-| theme | 'light' \| 'dark' | No | 'light' | UI theme |
-| disableArtifacts | boolean | No | false | Disable artifacts display |
-| limitSources | number | No | undefined | Limit number of sources |
 
 ## Development
 
@@ -78,15 +20,31 @@ EntelligenceChat.init({
 
 ### Setup
 ```bash
-# Clone the repository
-git clone https://github.com/Entelligence-AI/chat-widget.git
-cd chat-widget
 
-# Install dependencies
-pnpm install
+# Create .env file
+cp .env.example .env
+
+# Add your API keys to .env
+VITE_API_KEY=your_api_key
+VITE_ORGANIZATION=your_organization
+VITE_REPO_NAME=your_repo_name
 
 # Start development server
 pnpm dev
+```
+
+### Development Environment
+The development server will start at http://localhost:5173 with HMR enabled.
+
+```bash
+# Start in development mode
+pnpm dev
+
+# Build and watch for changes
+pnpm build --watch
+
+# Test production build locally
+pnpm build && pnpm preview
 ```
 
 ### Build
@@ -103,6 +61,7 @@ pnpm build:vanilla  # Vanilla JS version only
 ```
 src/
 ├── react/         # React-specific code
+├── app/           # Main application components
 ├── types/         # TypeScript definitions
 ├── utils/         # Utility functions
 ├── main.tsx       # React entry point
@@ -110,14 +69,145 @@ src/
 └── react.tsx      # Main React component
 ```
 
-### Testing Locally
+### Technical Architecture
+
+#### Entry Points and Initialization
+The application follows this initialization flow:
+
+1. Vite uses index.html as the entry point:
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/index.tsx"></script>
+  </body>
+</html>
+```
+
+2. The index.tsx file bootstraps the React application:
+```typescript
+// src/index.tsx
+import { createRoot } from 'react-dom/client';
+import { App } from './app';
+
+const root = createRoot(document.getElementById('root')!);
+root.render(<App />);
+```
+
+3. The main application component (App) initializes the chat:
+```typescript
+// src/app/index.tsx
+export const App = ({
+  apiKey,
+  repoName,
+  organization,
+  theme,
+}: AnalyticsData) => {
+  return (
+    <div className={theme}>
+      <ChatErrorBoundary>
+        <DocsChat
+          apiKey={apiKey}
+          organization={organization}
+          repoName={repoName}
+        />
+      </ChatErrorBoundary>
+    </div>
+  );
+};
+```
+
+4. The build process creates two distinct bundles:
+   - A React component library for direct React integration
+   - A vanilla JS bundle that can self-initialize
+
+#### Build Configuration
+The project uses Vite with dual build modes for React and Vanilla JS:
+
+```typescript
+// vite.config.ts
+export default defineConfig(({ mode }) => ({
+  build: {
+    lib: {
+      entry: mode === 'react' 
+        ? 'src/react/index.ts'
+        : 'src/main-vanilla.tsx',
+      formats: ['es', 'umd']
+    },
+    rollupOptions: {
+      manualChunks: {
+        'react-vendor': ['react', 'react-dom'],
+        'ui-vendor': ['@assistant-ui/react'],
+        'markdown': ['@assistant-ui/react-markdown'],
+        'syntax': ['@assistant-ui/react-syntax-highlighter']
+      }
+    }
+  }
+}))
+```
+
+#### HTML Integration
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <script type="module">
+    import { EntelligenceChat } from './src/main.tsx'
+    
+    const container = document.getElementById('chat-widget')
+    EntelligenceChat.init({
+      analyticsData: {
+        repoName: import.meta.env.VITE_REPO_NAME,
+        organization: import.meta.env.VITE_ORGANIZATION,
+        apiKey: import.meta.env.VITE_API_KEY
+      }
+    }, container)
+  </script>
+</head>
+<body>
+  <div id="chat-widget"></div>
+</body>
+</html>
+```
+
+#### Build Process
+1. Vite builds two versions:
+   - React component library (`/react`)
+   - Vanilla JS bundle
+2. Code is optimized through:
+   - Tree shaking
+   - Code splitting
+   - Chunk optimization
+   - CSS code splitting
+3. Output includes:
+   - ES modules
+   - UMD bundles
+   - TypeScript declarations
+
+### Environment Variables
+Create a `.env` file in the root directory with:
+```env
+VITE_API_KEY=your_api_key
+VITE_ORGANIZATION=your_organization
+VITE_REPO_NAME=your_repo_name
+```
+
+### Local Testing
 ```bash
-# Create a local build
+# Build the package
 pnpm build
+
+# Create a local tarball
 pnpm pack
 
-# In your test project
-npm install /path/to/entelligence-ai-chat-widget-0.0.1.tgz
+# Install in another project
+cd ../your-test-project
+pnpm add ../chat-widget/entelligence-ai-chat-widget-0.0.4.tgz
 ```
 
 ## Browser Support
