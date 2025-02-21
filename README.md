@@ -28,6 +28,7 @@ cp .env.example .env
 VITE_API_KEY=your_api_key
 VITE_ORGANIZATION=your_organization
 VITE_REPO_NAME=your_repo_name
+VITE_COMPANY_NAME=your_company_name
 
 # Start development server
 pnpm dev
@@ -115,6 +116,7 @@ export const App = ({
           apiKey={apiKey}
           organization={organization}
           repoName={repoName}
+          companyName={companyName}
         />
       </ChatErrorBoundary>
     </div>
@@ -164,7 +166,8 @@ export default defineConfig(({ mode }) => ({
       analyticsData: {
         repoName: import.meta.env.VITE_REPO_NAME,
         organization: import.meta.env.VITE_ORGANIZATION,
-        apiKey: import.meta.env.VITE_API_KEY
+        apiKey: import.meta.env.VITE_API_KEY,
+        companyName: import.meta.env.VITE_COMPANY_NAME
       }
     }, container)
   </script>
