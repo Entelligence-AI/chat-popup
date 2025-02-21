@@ -1,6 +1,6 @@
 {
   "name": "@entelligence-ai/chat-widget",
-  "version": "0.0.13",
+  "version": "0.0.15",
   "private": false,
   "publishConfig": {
     "access": "restricted",
@@ -11,7 +11,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Entelligence-AI/chat-popup"
+    "url": "git+https://github.com/Entelligence-AI/chat-popup.git"
   },
   "files": [
     "dist",
@@ -22,8 +22,10 @@
     "dev": "vite",
     "build": "vite build && vite build --mode react && tsc --emitDeclarationOnly --outDir dist/types",
     "version:update": "ts-node scripts/version-update.ts",
-    "prepublishOnly": "npm run version:update && npm run build",
-    "publish": "npm publish --access public"
+    "prepublishOnly": "npm run build",
+    "publish:github": "npm publish --access public --registry=https://npm.pkg.github.com",
+    "publish:npm": "npm publish --access public --registry=https://registry.npmjs.org/",
+    "publish": "npm run version:update && npm run publish:github && npm run publish:npm"
   },
   "dependencies": {
     "@assistant-ui/react-markdown": "^0.7.20",
