@@ -28,13 +28,19 @@
   },
   "dependencies": {
     "@assistant-ui/react": "^0.7.88",
-    "@assistant-ui/react-markdown": "^0.7.21", 
+    "@assistant-ui/react-markdown": "^0.7.21",
     "@assistant-ui/react-syntax-highlighter": "^0.7.10",
     "@assistant-ui/react-ui": "^0.1.7",
+    "@radix-ui/react-slot": "^1.1.2",
+    "@radix-ui/react-tooltip": "^1.1.8",
+    "class-variance-authority": "^0.7.1",
     "classnames": "^2.5.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.475.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-icons": "^5.4.0",
+    "tailwind-merge": "^3.0.2",
     "tailwindcss": "^3.4.9"
   },
   "devDependencies": {
@@ -53,8 +59,8 @@
     "globals": "^15.9.0",
     "postcss": "^8.4.41",
     "posthog-js": "^1.155.0",
-    "react-syntax-highlighter": "^15.5.0",
-    "remark-gfm": "^4.0.0",
+    "react-syntax-highlighter": "^15.6.1",
+    "remark-gfm": "^4.0.1",
     "tailwindcss-animate": "^1.0.7",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.3",
@@ -86,8 +92,12 @@
   },
   "typesVersions": {
     "*": {
-      "react": ["./dist/types/react/index.d.ts"],
-      "*": ["./dist/types/main-vanilla.d.ts"]
+      "react": [
+        "./dist/types/react/index.d.ts"
+      ],
+      "*": [
+        "./dist/types/main-vanilla.d.ts"
+      ]
     }
   },
   "peerDependencies": {
