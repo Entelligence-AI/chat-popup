@@ -9,26 +9,19 @@ import {
 import {
   Thread,
   Composer,
-  AssistantModal,
-  makeMarkdownText,
+  AssistantModal,  
   ThreadWelcome,
   type ThreadConfig,
 } from '@assistant-ui/react-ui';
-import { makePrismAsyncSyntaxHighlighter } from '@assistant-ui/react-syntax-highlighter';
-import { coldarkDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
-import remarkGfm from 'remark-gfm';
+import { MarkdownText } from '@/components/assistant-ui/markdown-text';
 import { FaSlack } from 'react-icons/fa';
 import { IoClose } from 'react-icons/io5';
 
-import '@assistant-ui/react-markdown/styles/markdown.css';
 import '@assistant-ui/react/styles/index.css';
 import '@assistant-ui/react/styles/modal.css';
 
 import { AnalyticsData } from '@/types';
 import { usePostHog } from 'posthog-js/react';
-
-// Use Vite's env variable instead
-const mode = import.meta.env.MODE;
 
 export const App = ({
   apiKey,
@@ -76,35 +69,6 @@ function asAsyncIterable<T>(source: ReadableStream<T>): AsyncIterable<T> {
       };
     },
   };
-}
-
-let SyntaxHighlighter;
-let MarkdownText;
-
-if (mode === 'react') {
-  SyntaxHighlighter = makePrismAsyncSyntaxHighlighter({
-    style: coldarkDark,
-    customStyle: {
-      margin: 0,
-      backgroundColor: 'black',
-    },
-  });
-
-  MarkdownText = makeMarkdownText({
-    remarkPlugins: [remarkGfm],
-    components: {
-      SyntaxHighlighter: SyntaxHighlighter as any,
-    },
-    className: 'entelligence-chat-markdown',
-  });
-} else {
-  MarkdownText = makeMarkdownText({
-    remarkPlugins: [remarkGfm],
-    components: {
-      SyntaxHighlighter: SyntaxHighlighter as any,
-    },
-    className: 'entelligence-chat-markdown',
-  });  
 }
 
 const MyCustomAdapter = ({
