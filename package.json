@@ -1,6 +1,6 @@
 {
   "name": "@entelligence-ai/chat-widget",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "private": false,
   "publishConfig": {
     "access": "restricted",
@@ -24,7 +24,7 @@
     "prepublishOnly": "npm run build",
     "publish:github": "npm publish --access public --registry=https://npm.pkg.github.com",
     "publish:npm": "npm publish --access public --registry=https://registry.npmjs.org/",
-    "publish": "npm run version:update && npm run publish:github && npm run publish:npm"
+    "publish:all": "npm run version:update && npm run publish:github && npm run publish:npm"
   },
   "dependencies": {
     "@assistant-ui/react": "^0.7.88",
