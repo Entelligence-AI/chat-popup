@@ -1,7 +1,7 @@
 import { EntelligenceChat } from '../react';
 import type { InitType } from '../types';
-import '../index.css';
+import '../index.css'; // This should contain your Tailwind imports
 
-// The styles should be included with the component
+// Re-export everything needed
 export { EntelligenceChat };
 export type { InitType }; 
