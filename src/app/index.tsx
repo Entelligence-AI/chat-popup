@@ -1,9 +1,8 @@
-import React from 'react';
 import { FC, useEffect, useState } from 'react';
 import {
   AssistantModalPrimitive,
   ChatModelAdapter,
-  useLocalRuntime,    
+  useLocalRuntime,
   type ThreadMessage,
   useThread,
 } from '@assistant-ui/react';
@@ -28,31 +27,8 @@ import '@assistant-ui/react/styles/modal.css';
 import { AnalyticsData } from '@/types';
 import { usePostHog } from 'posthog-js/react';
 
-class ChatErrorBoundary extends React.Component<
-  { children: React.ReactNode },
-  { hasError: boolean }
-> {
-  constructor(props: { children: React.ReactNode }) {
-    super(props);
-    this.state = { hasError: false };
-  }
-
-  static getDerivedStateFromError() {
-    return { hasError: true };
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div className="p-4 text-red-500">
-          Something went wrong with the chat. Please try refreshing the page.
-        </div>
-      );
-    }
-
-    return this.props.children;
-  }
-}
+// Use Vite's env variable instead
+const mode = import.meta.env.MODE;
 
 export const App = ({
   apiKey,
@@ -74,15 +50,13 @@ export const App = ({
   return (
     <div className={theme}>
       {apiKey && (
-        <ChatErrorBoundary>        
-          <DocsChat
-            apiKey={apiKey}
-            organization={organization}
-            companyName={companyName}
-            repoName={repoName}
-            theme={theme}
-          />
-        </ChatErrorBoundary>
+        <DocsChat
+          apiKey={apiKey}
+          organization={organization}
+          companyName={companyName}
+          repoName={repoName}
+          theme={theme}
+        />
       )}
     </div>
   );
@@ -104,20 +78,34 @@ function asAsyncIterable<T>(source: ReadableStream<T>): AsyncIterable<T> {
   };
 }
 
-const SyntaxHighlighter = makePrismAsyncSyntaxHighlighter({
-  style: coldarkDark,
-  customStyle: {
-    margin: 0,
-    backgroundColor: 'black',
-  },
-});
+let SyntaxHighlighter;
+let MarkdownText;
 
-const MarkdownText = makeMarkdownText({
-  remarkPlugins: [remarkGfm],
-  components: {
-    SyntaxHighlighter: SyntaxHighlighter as any,
-  },
-});
+if (mode === 'react') {
+  SyntaxHighlighter = makePrismAsyncSyntaxHighlighter({
+    style: coldarkDark,
+    customStyle: {
+      margin: 0,
+      backgroundColor: 'black',
+    },
+  });
+
+  MarkdownText = makeMarkdownText({
+    remarkPlugins: [remarkGfm],
+    components: {
+      SyntaxHighlighter: SyntaxHighlighter as any,
+    },
+    className: 'entelligence-chat-markdown',
+  });
+} else {
+  MarkdownText = makeMarkdownText({
+    remarkPlugins: [remarkGfm],
+    components: {
+      SyntaxHighlighter: SyntaxHighlighter as any,
+    },
+    className: 'entelligence-chat-markdown',
+  });  
+}
 
 const MyCustomAdapter = ({
   apiKey,
@@ -212,7 +200,9 @@ const MyAssistantModal: FC<ThreadConfig & AnalyticsData> = (config) => {
   );
 };
 
-const MyAssistantModalTrigger: FC<{ theme?: string }> = ({ theme = 'light' }) => {
+const MyAssistantModalTrigger: FC<{ theme?: string }> = ({
+  theme = 'light',
+}) => {
   return (
     <AssistantModal.Anchor className="hidden md:block">
       <AssistantModalPrimitive.Trigger asChild>
@@ -292,16 +282,17 @@ const OssSlack: FC<{
   vectorDBUrl: string;
   chatHist: Array<{ question: string; answer: string }>;
   theme?: string;
-}> = ({ apiKey, vectorDBUrl, chatHist, theme = "light" }) => {
+}> = ({ apiKey, vectorDBUrl, chatHist, theme = 'light' }) => {
+  const validTheme = theme === 'dark' ? 'dark' : 'light';
+  const isDark = validTheme === 'dark';
 
-  const validTheme = theme === "dark" ? "dark" : "light";
-  const isDark = validTheme === "dark";
-
-  const bgColor = isDark ? "bg-[#1f1f26]" : "bg-white";
-  const textColor = isDark ? "text-gray-300" : "text-gray-800";
-  const borderColor = isDark ? "border-[#4a4a4f]" : "border-gray-300";
-  const buttonBgColor = isDark ? "bg-[#C7E576] text-gray-900" : "bg-[#C7E576] text-black";
-  const hoverEffect = isDark ? "hover:opacity-80" : "hover:opacity-90";
+  const bgColor = isDark ? 'bg-[#1f1f26]' : 'bg-white';
+  const textColor = isDark ? 'text-gray-300' : 'text-gray-800';
+  const borderColor = isDark ? 'border-[#4a4a4f]' : 'border-gray-300';
+  const buttonBgColor = isDark
+    ? 'bg-[#C7E576] text-gray-900'
+    : 'bg-[#C7E576] text-black';
+  const hoverEffect = isDark ? 'hover:opacity-80' : 'hover:opacity-90';
 
   const [showForm, setShowForm] = useState(false);
   const [email, setEmail] = useState('');
@@ -316,7 +307,7 @@ const OssSlack: FC<{
       const result = await isOssQueryAllowed(apiKey, vectorDBUrl);
       setAllowed(result);
     };
-    cckIfOssQueryIsAllowed();
+    checkIfOssQueryIsAllowed();
   }, [apiKey, vectorDBUrl]);
 
   const handleSubmit = async () => {
@@ -331,7 +322,7 @@ const OssSlack: FC<{
     const result = await sendSlackQuery(
       apiKey,
       vectorDBUrl,
-	  JSON.stringify(chatHist),
+      JSON.stringify(chatHist),
       question,
       email
     );
@@ -345,81 +336,97 @@ const OssSlack: FC<{
   };
 
   return (
-    <div className={`flex flex-col items-end w-full ${isDark ? "dark" : ""}`}>
+    <div className={`flex flex-col items-end w-full ${isDark ? 'dark' : ''}`}>
       {!allowed ? (
         <div></div>
       ) : (
-          <>
-            {!showForm ? (
-              <button
-                className={`mt-4 p-3 border ${borderColor} rounded-lg shadow-md ${hoverEffect} transition flex items-center gap-2 ${bgColor} ${textColor}`}
-                onClick={() => setShowForm(true)}
-              >
-                <span className="flex items-center gap-2">
-                  <span className="text-sm font-medium">Reach Owners on Slack</span>
-                  <FaSlack size={24} className="text-[#c7e576]" />
+        <>
+          {!showForm ? (
+            <button
+              className={`mt-4 p-3 border ${borderColor} rounded-lg shadow-md ${hoverEffect} transition flex items-center gap-2 ${bgColor} ${textColor}`}
+              onClick={() => setShowForm(true)}
+            >
+              <span className="flex items-center gap-2">
+                <span className="text-sm font-medium">
+                  Reach Owners on Slack
                 </span>
+                <FaSlack size={24} className="text-[#c7e576]" />
+              </span>
+            </button>
+          ) : (
+            <div
+              className={`mt-4 p-3 border ${borderColor} rounded-lg shadow-md w-full max-w-sm ${bgColor} relative`}
+            >
+              <button
+                className={`absolute top-2 right-2 text-gray-500 ${
+                  isDark
+                    ? 'dark:text-gray-400 hover:dark:text-gray-300'
+                    : 'hover:text-gray-700'
+                }`}
+                onClick={() => setShowForm(false)}
+              >
+                <IoClose size={20} />
               </button>
-            ) : (
-              <div className={`mt-4 p-3 border ${borderColor} rounded-lg shadow-md w-full max-w-sm ${bgColor} relative`}>
-                <button
-                  className={`absolute top-2 right-2 text-gray-500 ${isDark ? "dark:text-gray-400 hover:dark:text-gray-300" : "hover:text-gray-700"}`}
-                  onClick={() => setShowForm(false)}
-                >
-                  <IoClose size={20} />
-                </button>
 
-                <div className="flex items-center gap-2 mb-3">
-                  <FaSlack size={24} className="text-[#c7e576]" />
-                  <h3 className={`text-lg font-semibold ${textColor}`}>
-                    Reach Owners on Slack
-                  </h3>
-                </div>
-
-                {!submitted ? (
-                  <>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className={`w-full p-2 bg-transparent border ${borderColor} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 ${textColor} placeholder-gray-500 dark:placeholder-gray-400`}
-                      placeholder="Email"
-                    />
-
-                    <textarea
-                      value={question}
-                      onChange={(e) => setQuestion(e.target.value)}
-                      className={`w-full p-2 mt-3 bg-transparent border ${borderColor} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 ${textColor} placeholder-gray-500 dark:placeholder-gray-400`}
-                      placeholder="Enter your question"
-                      rows={3}
-                    ></textarea>
-
-                    {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
-
-                    <div className="mt-3 flex justify-end">
-                      <button
-                        className={`px-4 py-1 text-sm rounded-md transition ${loading ? "bg-gray-400 cursor-not-allowed text-black dark:text-gray-700" : `${buttonBgColor} ${hoverEffect}`}`}
-                        onClick={handleSubmit}
-                        disabled={loading}
-                      >
-                        {loading ? 'Submitting...' : 'Submit'}
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  <div className={`text-center ${textColor}`}>
-                    <p className="text-sm">Thank you! Your question has been submitted.</p>
-                    <p className="mt-2">
-                      <strong>Email:</strong> {email}
-                    </p>
-                    <p className="mt-1">
-                      <strong>Question:</strong> {question}
-                    </p>
-                  </div>
-                )}
+              <div className="flex items-center gap-2 mb-3">
+                <FaSlack size={24} className="text-[#c7e576]" />
+                <h3 className={`text-lg font-semibold ${textColor}`}>
+                  Reach Owners on Slack
+                </h3>
               </div>
-            )}
-          </>
+
+              {!submitted ? (
+                <>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className={`w-full p-2 bg-transparent border ${borderColor} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 ${textColor} placeholder-gray-500 dark:placeholder-gray-400`}
+                    placeholder="Email"
+                  />
+
+                  <textarea
+                    value={question}
+                    onChange={(e) => setQuestion(e.target.value)}
+                    className={`w-full p-2 mt-3 bg-transparent border ${borderColor} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 ${textColor} placeholder-gray-500 dark:placeholder-gray-400`}
+                    placeholder="Enter your question"
+                    rows={3}
+                  ></textarea>
+
+                  {error && (
+                    <p className="text-red-500 text-sm mt-2">{error}</p>
+                  )}
+
+                  <div className="mt-3 flex justify-end">
+                    <button
+                      className={`px-4 py-1 text-sm rounded-md transition ${
+                        loading
+                          ? 'bg-gray-400 cursor-not-allowed text-black dark:text-gray-700'
+                          : `${buttonBgColor} ${hoverEffect}`
+                      }`}
+                      onClick={handleSubmit}
+                      disabled={loading}
+                    >
+                      {loading ? 'Submitting...' : 'Submit'}
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className={`text-center ${textColor}`}>
+                  <p className="text-sm">
+                    Thank you! Your question has been submitted.
+                  </p>
+                  <p className="mt-2">
+                    <strong>Email:</strong> {email}
+                  </p>
+                  <p className="mt-1">
+                    <strong>Question:</strong> {question}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+        </>
       )}
     </div>
   );
@@ -430,30 +437,30 @@ const MyThread: FC<{
   vectorDBUrl: string;
   theme?: string;
 }> = ({ apiKey, vectorDBUrl, theme = 'light' }) => {
-    const messages = useThread((t) => t.messages);
-    
-	const lastThreeQA = [];
-	const reversedMessages = [...messages].reverse();
-	let currentPair: { question?: string; answer?: string } = {};
+  const messages = useThread((t) => t.messages);
 
-	for (const message of reversedMessages.reverse()) {
-		const text = message.content
-			?.map((c) => (c.type === 'text' ? c.text : ''))
-			.join(' ');
+  const lastThreeQA = [];
+  const reversedMessages = [...messages].reverse();
+  let currentPair: { question?: string; answer?: string } = {};
 
-		if (message.role === 'assistant' && currentPair.question) {
-			currentPair.answer = text;
-			lastThreeQA.push(currentPair);
-			currentPair = {};
-		} else if (message.role === 'user') {
-			currentPair.question = text;
-		}
-		if (lastThreeQA.length >= 3) break;
-	}
-	const chatHist = lastThreeQA.map((pair) => ({
-		question: pair.question ?? '',
-		answer: pair.answer ?? '',
-	}));
+  for (const message of reversedMessages.reverse()) {
+    const text = message.content
+      ?.map((c) => (c.type === 'text' ? c.text : ''))
+      .join(' ');
+
+    if (message.role === 'assistant' && currentPair.question) {
+      currentPair.answer = text;
+      lastThreeQA.push(currentPair);
+      currentPair = {};
+    } else if (message.role === 'user') {
+      currentPair.question = text;
+    }
+    if (lastThreeQA.length >= 3) break;
+  }
+  const chatHist = lastThreeQA.map((pair) => ({
+    question: pair.question ?? '',
+    answer: pair.answer ?? '',
+  }));
 
   return (
     <Thread.Root className="flex flex-col">
@@ -464,7 +471,7 @@ const MyThread: FC<{
           apiKey={apiKey}
           vectorDBUrl={vectorDBUrl}
           chatHist={chatHist}
-		  theme={theme}
+          theme={theme}
         />
         <Thread.ViewportFooter className="pb-3">
           <Thread.ScrollToBottom />
@@ -476,7 +483,12 @@ const MyThread: FC<{
         href="https://entelligence.ai"
         className="text-muted-foreground flex w-full items-center justify-center gap-2 border-t py-2 text-xs"
       >
-        In partnership with <ChatIcon width={16} height={16} theme={theme === 'light' ? 'dark' : 'light'} />{' '}
+        In partnership with{' '}
+        <ChatIcon
+          width={16}
+          height={16}
+          theme={theme === 'light' ? 'dark' : 'light'}
+        />{' '}
         <span className="flex items-center gap-2">Entelligence</span>
       </a>
     </Thread.Root>
