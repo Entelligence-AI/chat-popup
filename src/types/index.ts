@@ -3,6 +3,7 @@ export type AnalyticsData = {
     repoName: string;
     organization: string;
     theme?: 'light' | 'dark';
+    companyName?: string;
 }
 
 export type InitType = {

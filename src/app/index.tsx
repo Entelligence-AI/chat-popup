@@ -59,6 +59,7 @@ export const App = ({
   repoName,
   organization,
   theme,
+  companyName,
 }: AnalyticsData) => {
   const posthog = usePostHog();
 
@@ -77,6 +78,7 @@ export const App = ({
           <DocsChat
             apiKey={apiKey}
             organization={organization}
+            companyName={companyName}
             repoName={repoName}
             theme={theme}
           />
@@ -171,6 +173,7 @@ const MyCustomAdapter = ({
 export const DocsChat = ({
   repoName,
   organization,
+  companyName,
   apiKey,
   theme,
 }: AnalyticsData) => {
@@ -184,7 +187,7 @@ export const DocsChat = ({
     <MyAssistantModal
       runtime={runtime}
       welcome={{
-        message: `Ask any question about ${repoName}`,
+        message: `Ask any question about ${companyName}`,
       }}
       assistantMessage={{ components: { Text: MarkdownText } }}
       organization={organization}
@@ -314,7 +317,7 @@ const OssSlack: FC<{
       const result = await isOssQueryAllowed(apiKey, vectorDBUrl);
       setAllowed(result);
     };
-    checkIfOssQueryIsAllowed();
+    cckIfOssQueryIsAllowed();
   }, [apiKey, vectorDBUrl]);
 
   const handleSubmit = async () => {
