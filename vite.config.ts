@@ -29,24 +29,38 @@ export default defineConfig(({ mode }) => {
         fileName: (format) => `entelligence-chat${isReactBuild ? '-react' : ''}.${format}.js`
       },
       rollupOptions: {
-        external: ['react', 'react-dom', 'react/jsx-runtime'],
+        external: isReactBuild ? ['react', 'react-dom', 'react/jsx-runtime'] : [],
         output: {
-          globals: {
+          globals: isReactBuild ? {
             'react': 'React',
             'react-dom': 'ReactDOM',
             'react/jsx-runtime': 'ReactJSXRuntime'
+          } : {},
+          assetFileNames: (assetInfo) => {
+            if (assetInfo?.name?.endsWith('.css')) {
+              return 'styles/[name][extname]';
+            }
+            return 'assets/[name][extname]';
           }
         }
       },
-      cssCodeSplit: false
+      cssCodeSplit: true
     },
     css: {
       modules: {
         generateScopedName: '[name]__[local]___[hash:base64:5]'
+      },
+      postcss: {
+        modules: true
+      },
+      preprocessorOptions: {
+        scss: {
+          additionalData: '@tailwind base; @tailwind components; @tailwind utilities;'
+        }
       }
     },
     optimizeDeps: {
-      include: ['@assistant-ui/react-markdown']
+      include: []
     },
     plugins: [
       react(),

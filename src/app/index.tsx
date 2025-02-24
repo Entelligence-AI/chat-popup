@@ -115,6 +115,7 @@ const MarkdownText = makeMarkdownText({
   components: {
     SyntaxHighlighter: SyntaxHighlighter as any,
   },
+  className: 'entelligence-chat-markdown'
 });
 
 const MyCustomAdapter = ({

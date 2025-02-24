@@ -15,8 +15,7 @@
   },
   "files": [
     "dist",
-    "README.md",
-    "package.json"
+    "README.md"
   ],
   "scripts": {
     "dev": "vite",
@@ -32,6 +31,9 @@
     "@assistant-ui/react-ui": "^0.1.7",
     "@assistant-ui/react-syntax-highlighter": "^0.7.10",
     "@assistant-ui/react": "^0.7.77",
+    "@radix-ui/react-compose-refs": "^1.0.0",
+    "@radix-ui/react-context": "^1.0.0",
+    "classnames": "^2.5.1",
     "react-icons": "^5.4.0",
     "vite-plugin-css-injected-by-js": "^3.5.1",
     "vite-plugin-dts": "^4.5.0"
@@ -68,22 +70,14 @@
   },
   "main": "./dist/vanilla/entelligence-chat.umd.js",
   "module": "./dist/vanilla/entelligence-chat.es.js",
-  "types": "./dist/types/main.d.ts",
+  "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/types/main.d.ts",
       "import": "./dist/vanilla/entelligence-chat.es.js",
-      "require": "./dist/vanilla/entelligence-chat.umd.js"
+      "require": "./dist/vanilla/entelligence-chat.umd.js",
+      "types": "./dist/types/index.d.ts"
     },
-    "./react": {
-      "types": "./dist/types/react/index.d.ts",
-      "import": "./dist/react/entelligence-chat-react.es.js",
-      "require": "./dist/react/entelligence-chat-react.umd.js"
-    },
-    "./style.css": {
-      "import": "./dist/react/style.css",
-      "require": "./dist/react/style.css"
-    }
+    "./styles.css": "./dist/vanilla/styles/index.css"
   },
   "typesVersions": {
     "*": {

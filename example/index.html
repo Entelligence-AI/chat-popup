@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>EntelligenceChat Demo</title>
+</head>
+<body>
+  <!-- Dependencies -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/react/jsx-runtime"></script>
+  <script src="https://unpkg.com/classnames@2.5.1/index.js"></script>
+  <script src="https://unpkg.com/@radix-ui/react-compose-refs@1.0.0/dist/index.umd.js"></script>
+  <script src="https://unpkg.com/@radix-ui/react-context@1.0.0/dist/index.umd.js"></script>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../dist/vanilla/styles/index.css">
+  <link rel="stylesheet" href="../dist/vanilla/styles/markdown.css">
+  <link rel="stylesheet" href="../dist/vanilla/styles/modal.css">
+
+  <!-- EntelligenceChat -->
+  <script src="../dist/vanilla/entelligence-chat.umd.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      window.EntelligenceChat.init({
+        // your config options
+      });
+    });
+  </script>
+</body>
+</html> 
