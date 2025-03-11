@@ -5010,11 +5010,6 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-<<<<<<< HEAD
-=======
-  prismjs@1.27.0: {}
-
->>>>>>> fb4de9a5ca951b9d1920873cdc33473362a28f12
   prismjs@1.30.0: {}
 
   property-information@5.6.0:
