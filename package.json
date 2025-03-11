@@ -26,8 +26,8 @@
     "build:css": "tailwindcss -i ./src/combined.css -o ./public/styles.css",
     "version:update": "ts-node scripts/version-update.ts",
     "prepublishOnly": "npm run build",
-    "publish:github": "npm publish --access public --registry=https://npm.pkg.github.com",
-    "publish:npm": "npm publish --access public --registry=https://registry.npmjs.org/",
+    "publish:github": "cp npmrc.github .npmrc && npm publish --access public && rm .npmrc",
+    "publish:npm": "cp npmrc.npm .npmrc && npm publish --access public && rm .npmrc",
     "publish:all": "npm run version:update && npm run publish:github && npm run publish:npm"
   },
   "dependencies": {
