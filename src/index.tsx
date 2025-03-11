@@ -1,37 +1,55 @@
-import { createRoot } from 'react-dom/client';
-import { App } from './app';
-import { StrictMode } from 'react';
-import type { InitType } from './types';
+// Remove the unused React import since we're using automatic JSX runtime
 
-// Only run this in development
-if (import.meta.env.DEV) {
-  const rootElement = document.getElementById('root');
-  console.log('Root element:', rootElement); // Debug
+// Add more debugging
+console.log('Starting application...');
 
-  if (!rootElement) {
-    throw new Error('Root element not found');
+function initApp() {
+  if (import.meta.env.DEV) {
+    const rootElement = document.getElementById('root');
+    console.log('Root element:', rootElement);
+    
+    if (!rootElement) {
+      throw new Error('Root element not found');
+    }
+    
+    // Import React components
+    Promise.all([
+      import('react-dom/client'),
+      import('./app'),
+      import('react')
+    ]).then(([{ createRoot }, { App }, { StrictMode }]) => {
+      console.log('React modules loaded');
+      
+      const analyticsData = {
+        apiKey: "test-api-key",
+        repoName: "chat-popup",
+        organization: "Entelligence-AI",
+        theme: "light" as const,
+        companyName: "Entelligence AI",    
+      };
+      
+      document.body.classList.add(analyticsData?.theme || 'light');
+      const root = createRoot(rootElement);
+      
+      console.log('Root created, rendering app...');
+      
+      root.render(
+        <StrictMode>
+          <App {...analyticsData} />
+        </StrictMode>
+      );
+      
+      console.log('App rendered');
+    }).catch(error => {
+      console.error('Error initializing app:', error);
+    });
   }
+}
 
-  const analyticsData: InitType['analyticsData'] = {
-    apiKey: "test-api-key",
-    repoName: "chat-popup",
-    organization: "Entelligence-AI",
-    theme: "light",
-    companyName: "Entelligence AI",
-  };
-
-  document.body.classList.add(analyticsData?.theme || 'light');
-
-  const root = createRoot(rootElement);
-  
-  const app = (
-    <StrictMode>
-      <App {...analyticsData} />
-    </StrictMode>
-  );
-
-  console.log('Rendering app:', app); // Debug
-  root.render(app);
+try {
+  initApp();
+} catch (error) {
+  console.error('Error initializing app:', error);
 }
 
 // Re-export everything from main for the library build
