@@ -1,6 +1,6 @@
 {
   "name": "@entelligence-ai/chat-widget",
-  "version": "0.0.23",
+  "version": "0.0.20",
   "private": false,
   "publishConfig": {
     "access": "restricted",
