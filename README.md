@@ -5,11 +5,52 @@ A customizable chat widget that provides AI-powered chat functionality based on 
 ## Installation
 
 ```bash
-npm install
+# Using npm
+npm install @entelligence-ai/chat-widget
+
+# Using pnpm
+pnpm add @entelligence-ai/chat-widget
 ```
 
-```bash
-pnpm install
+## Usage
+
+### React Component
+```tsx
+import { EntelligenceChat } from '@entelligence-ai/chat-widget/react';
+// Import styles separately
+import '@entelligence-ai/chat-widget/style.css';
+
+function App() {
+  return (
+    <EntelligenceChat 
+      analyticsData={{
+        apiKey: "your-api-key",
+        repoName: "your-repo",
+        organization: "your-org",
+        companyName: "Your Company",
+        theme: "light"
+      }} 
+    />
+  );
+}
+```
+
+### Vanilla JavaScript
+```html
+<script type="module">
+  import { EntelligenceChatInit } from '@entelligence-ai/chat-widget';
+  import '@entelligence-ai/chat-widget/style.css';
+
+  EntelligenceChatInit({
+    analyticsData: {
+      apiKey: "your-api-key",
+      repoName: "your-repo",
+      organization: "your-org",
+      companyName: "Your Company",
+      theme: "light"
+    }
+  });
+</script>
 ```
 
 ## Development
@@ -82,6 +123,7 @@ The application follows this initialization flow:
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="node_modules/@entelligence-ai/chat-widget/style.css">
   </head>
   <body>
     <div id="root"></div>
@@ -95,6 +137,7 @@ The application follows this initialization flow:
 // src/index.tsx
 import { createRoot } from 'react-dom/client';
 import { App } from './app';
+import '@entelligence-ai/chat-widget/style.css';
 
 const root = createRoot(document.getElementById('root')!);
 root.render(<App />);
@@ -124,73 +167,15 @@ export const App = ({
 };
 ```
 
-4. The build process creates two distinct bundles:
-   - A React component library for direct React integration
-   - A vanilla JS bundle that can self-initialize
+### CSS and Styling
+The package includes two CSS bundles:
+- `@entelligence-ai/chat-widget/style.css` - Main styles for the widget
+- `@entelligence-ai/chat-widget/styles.css` - Additional styles (if needed)
 
-#### Build Configuration
-The project uses Vite with dual build modes for React and Vanilla JS:
-
+You must import at least the main style.css for the widget to work properly:
 ```typescript
-// vite.config.ts
-export default defineConfig(({ mode }) => ({
-  build: {
-    lib: {
-      entry: mode === 'react' 
-        ? 'src/react/index.ts'
-        : 'src/main-vanilla.tsx',
-      formats: ['es', 'umd']
-    },
-    rollupOptions: {
-      manualChunks: {
-        'react-vendor': ['react', 'react-dom'],
-        'ui-vendor': ['@assistant-ui/react'],
-        'markdown': ['@assistant-ui/react-markdown'],
-        'syntax': ['@assistant-ui/react-syntax-highlighter']
-      }
-    }
-  }
-}))
+import '@entelligence-ai/chat-widget/style.css';
 ```
-
-#### HTML Integration
-```html
-<!DOCTYPE html>
-<html>
-<head>
-  <script type="module">
-    import { EntelligenceChat } from './src/main.tsx'
-    
-    const container = document.getElementById('chat-widget')
-    EntelligenceChat.init({
-      analyticsData: {
-        repoName: import.meta.env.VITE_REPO_NAME,
-        organization: import.meta.env.VITE_ORGANIZATION,
-        apiKey: import.meta.env.VITE_API_KEY,
-        companyName: import.meta.env.VITE_COMPANY_NAME
-      }
-    }, container)
-  </script>
-</head>
-<body>
-  <div id="chat-widget"></div>
-</body>
-</html>
-```
-
-#### Build Process
-1. Vite builds two versions:
-   - React component library (`/react`)
-   - Vanilla JS bundle
-2. Code is optimized through:
-   - Tree shaking
-   - Code splitting
-   - Chunk optimization
-   - CSS code splitting
-3. Output includes:
-   - ES modules
-   - UMD bundles
-   - TypeScript declarations
 
 ### Environment Variables
 Create a `.env` file in the root directory with:
