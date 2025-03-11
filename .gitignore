@@ -75,3 +75,6 @@ apps/svendio-frontend/
 
 # npmrc
 .npmrc
+.npmrc.local
+.npmrc.github
+.npmrc.npm
