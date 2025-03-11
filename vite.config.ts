@@ -6,8 +6,6 @@ import dts from 'vite-plugin-dts';
 import type { Mode } from 'vite';
 import commonjs from '@rollup/plugin-commonjs';
 import type { AssetInfo } from 'rollup';
-import fs from 'fs';
-import path from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }: { mode: Mode }) => {

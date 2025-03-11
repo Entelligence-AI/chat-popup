@@ -2,14 +2,7 @@
 // Add more debugging
 console.log('Starting application...');
 
-try {
-  // Import the CSS loader
-  const { loadCSS } = await import('./css-loader');
-  
-  // Load CSS programmatically
-  loadCSS();
-  console.log('CSS loaded successfully');
-  
+try {    
   if (import.meta.env.DEV) {
     const rootElement = document.getElementById('root');
     console.log('Root element:', rootElement);
