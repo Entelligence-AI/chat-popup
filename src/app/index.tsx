@@ -17,6 +17,9 @@ import { MarkdownText } from '@/components/assistant-ui/markdown-text';
 import { FaSlack } from 'react-icons/fa';
 import { IoClose } from 'react-icons/io5';
 
+import '@assistant-ui/react/styles/index.css';
+import '@assistant-ui/react/styles/modal.css';
+
 import { AnalyticsData } from '@/types';
 import { usePostHog } from 'posthog-js/react';
 

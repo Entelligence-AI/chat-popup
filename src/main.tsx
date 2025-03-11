@@ -9,7 +9,7 @@ export const init = ({ analyticsData }: InitType) => {
     reactContainer.id = 'react-app-container';
     document.body.appendChild(reactContainer);
     
-    const root = createRoot(reactContainer);
+    const root = createRoot(reactContainer);    
     root.render(<EntelligenceChat analyticsData={analyticsData} />);
 };
 

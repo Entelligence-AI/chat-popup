@@ -1,37 +1,53 @@
-import { createRoot } from 'react-dom/client';
-import { App } from './app';
-import { StrictMode } from 'react';
-import type { InitType } from './types';
 
-// Only run this in development
-if (import.meta.env.DEV) {
-  const rootElement = document.getElementById('root');
-  console.log('Root element:', rootElement); // Debug
+// Add more debugging
+console.log('Starting application...');
 
-  if (!rootElement) {
-    throw new Error('Root element not found');
-  }
-
-  const analyticsData: InitType['analyticsData'] = {
-    apiKey: "test-api-key",
-    repoName: "chat-popup",
-    organization: "Entelligence-AI",
-    theme: "light",
-    companyName: "Entelligence AI",
-  };
-
-  document.body.classList.add(analyticsData?.theme || 'light');
-
-  const root = createRoot(rootElement);
+try {
+  // Import the CSS loader
+  const { loadCSS } = await import('./css-loader');
   
-  const app = (
-    <StrictMode>
-      <App {...analyticsData} />
-    </StrictMode>
-  );
-
-  console.log('Rendering app:', app); // Debug
-  root.render(app);
+  // Load CSS programmatically
+  loadCSS();
+  console.log('CSS loaded successfully');
+  
+  if (import.meta.env.DEV) {
+    const rootElement = document.getElementById('root');
+    console.log('Root element:', rootElement);
+    
+    if (!rootElement) {
+      throw new Error('Root element not found');
+    }
+    
+    // Import React components
+    const { createRoot } = await import('react-dom/client');
+    const { App } = await import('./app');
+    const { StrictMode } = await import('react');
+    
+    console.log('React modules loaded');
+    
+    const analyticsData = {
+      apiKey: "test-api-key",
+      repoName: "chat-popup",
+      organization: "Entelligence-AI",
+      theme: "light" as const,
+      companyName: "Entelligence AI",    
+    };
+    
+    document.body.classList.add(analyticsData?.theme || 'light');
+    const root = createRoot(rootElement);
+    
+    console.log('Root created, rendering app...');
+    
+    root.render(
+      <StrictMode>
+        <App {...analyticsData} />
+      </StrictMode>
+    );
+    
+    console.log('App rendered');
+  }
+} catch (error) {
+  console.error('Error initializing app:', error);
 }
 
 // Re-export everything from main for the library build
