@@ -72,3 +72,6 @@ apps/svendio-frontend/
 
 # temp files
 .temp.css
+
+# npmrc
+.npmrc
