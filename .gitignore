@@ -69,3 +69,6 @@ apps/svendio-backend/
 apps/svendio-frontend/
 .turbo
 .idea/dbnavigator.xml
+
+# temp files
+.temp.css

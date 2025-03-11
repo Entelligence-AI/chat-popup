@@ -3,8 +3,7 @@
   "version": "0.0.18",
   "private": false,
   "publishConfig": {
-    "access": "restricted",
-    "registry": "https://npm.pkg.github.com"
+    "access": "public"
   },
   "description": "Entelligence Chat Widget",
   "author": "Your Name",
@@ -19,17 +18,18 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "vite build && vite build --mode react && tsc --project tsconfig.build.json",
+    "build": "npm run build:css && vite build && vite build --mode react && tsc --project tsconfig.build.json",
     "version:update": "ts-node scripts/version-update.ts",
     "prepublishOnly": "npm run build",
-    "publish:github": "npm publish --access public --registry=https://npm.pkg.github.com",
-    "publish:npm": "npm publish --access public --registry=https://registry.npmjs.org/",
-    "publish:all": "npm run version:update && npm run publish:github && npm run publish:npm"
+    "publish:github": "cp .npmrc.github .npmrc && npm publish --registry=https://npm.pkg.github.com",
+    "publish:npm": "cp .npmrc.npm .npmrc && npm publish --registry=https://registry.npmjs.org",
+    "publish:all": "npm run version:update && npm run publish:github && npm run publish:npm",
+    "build:css": "vite build --config vite.config.css.ts"
   },
   "dependencies": {
-    "@assistant-ui/react": "^0.7.88",
-    "@assistant-ui/react-markdown": "^0.7.21",
-    "@assistant-ui/react-syntax-highlighter": "^0.7.10",
+    "@assistant-ui/react": "^0.8.5",
+    "@assistant-ui/react-markdown": "^0.8.0",
+    "@assistant-ui/react-syntax-highlighter": "^0.8.0",
     "@assistant-ui/react-ui": "^0.1.7",
     "@radix-ui/react-slot": "^1.1.2",
     "@radix-ui/react-tooltip": "^1.1.8",
@@ -41,7 +41,7 @@
     "react-dom": "^18.0.0",
     "react-icons": "^5.4.0",
     "tailwind-merge": "^3.0.2",
-    "tailwindcss": "^3.4.9"
+    "tailwindcss": "^3.4.1"
   },
   "devDependencies": {
     "@babel/preset-react": "^7.26.3",
@@ -57,7 +57,8 @@
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.9",
     "globals": "^15.9.0",
-    "postcss": "^8.4.41",
+    "postcss": "^8.4.35",
+    "postcss-nesting": "^12.0.2",
     "posthog-js": "^1.155.0",
     "react-syntax-highlighter": "^15.6.1",
     "remark-gfm": "^4.0.1",

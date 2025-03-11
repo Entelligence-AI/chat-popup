@@ -3,7 +3,7 @@ module.exports = {
     darkMode: ["class"],
     content: [
     "./src/**/*.{js,jsx,ts,tsx}",
-  ],
+  ],  
   theme: {
   	extend: {
   		borderRadius: {
@@ -52,6 +52,9 @@ module.exports = {
   				'4': 'hsl(var(--chart-4))',
   				'5': 'hsl(var(--chart-5))'
   			}
+  		},
+  		borderColor: {
+  			border: 'hsl(var(--border))'
   		}
   	}
   },
