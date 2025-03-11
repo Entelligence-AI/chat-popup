@@ -1,10 +1,9 @@
 {
   "name": "@entelligence-ai/chat-widget",
-  "version": "0.0.20",
+  "version": "0.0.25",
   "private": false,
   "publishConfig": {
-    "access": "restricted",
-    "registry": "https://npm.pkg.github.com"
+    "access": "public"
   },
   "description": "Entelligence Chat Widget",
   "author": "Your Name",
@@ -27,7 +26,7 @@
     "version:update": "ts-node scripts/version-update.ts",
     "prepublishOnly": "npm run build",
     "publish:github": "cp npmrc.github .npmrc && npm publish --access public && rm .npmrc",
-    "publish:npm": "cp npmrc.npm .npmrc && npm publish --access public && rm .npmrc",
+    "publish:npm": "cp npmrc.npm .npmrc && npm publish --access public --registry https://registry.npmjs.org/ && rm .npmrc",
     "publish:all": "npm run version:update && npm run publish:github && npm run publish:npm"
   },
   "dependencies": {
