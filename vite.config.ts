@@ -3,19 +3,14 @@ import react from '@vitejs/plugin-react';
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js';
 import { resolve } from 'path';
 import dts from 'vite-plugin-dts';
-import type { Mode } from 'vite';
 import commonjs from '@rollup/plugin-commonjs';
-import type { AssetInfo } from 'rollup';
+import fs from 'fs';
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }: { mode: Mode }) => {
+export default defineConfig(({ mode }: { mode: string }) => {
   const isReactBuild = mode === 'react';
-
-  // Create a virtual module for the patched file
-  const virtualModuleId = 'virtual:createContextHook';
-  const resolvedVirtualModuleId = '\0' + virtualModuleId;
-
-  const config = {
+ 
+  const config: UserConfig = {
     define: {
       'process.env.NODE_ENV': JSON.stringify(
         process.env.NODE_ENV || 'development'
@@ -33,12 +28,9 @@ export default defineConfig(({ mode }: { mode: Mode }) => {
         'util': resolve(__dirname, 'src/polyfills/util.ts'),
         'secure-json-parse': resolve(__dirname, 'src/polyfills/secure-json-parse.js'),
         'classnames': resolve(__dirname, 'src/polyfills/classnames.js'),
-        'react': resolve(__dirname, 'node_modules/react'),
-        'react-dom': resolve(__dirname, 'node_modules/react-dom'),
       },
       dedupe: ['react', 'react-dom'],
-      mainFields: ['browser', 'module', 'jsnext:main', 'jsnext', 'main'],
-      extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.css']
+      mainFields: ['module', 'jsnext:main', 'jsnext', 'main'],
     },
     build: {
       minify: 'esbuild',
@@ -50,133 +42,86 @@ export default defineConfig(({ mode }: { mode: Mode }) => {
           ? resolve(__dirname, 'src/react/index.ts')
           : resolve(__dirname, 'src/main-vanilla.tsx'),
         name: 'EntelligenceChat',
-        formats: ['es'],
+        formats: ['es', 'umd'],
         fileName: (format: string) =>
           `entelligence-chat${isReactBuild ? '-react' : ''}.${format}.js`,
-        requireReturnsDefault: 'auto',
-        esmExternals: true,
       },
       rollupOptions: {
-        external: isReactBuild
-          ? [
-              'react',
-              'react-dom',
-              'react/jsx-runtime',
-              '@assistant-ui/react-markdown',
-              '@emotion/react',
-              '@emotion/styled',
-            ]
-          : [],
-        input: {
-          main: isReactBuild
-            ? resolve(__dirname, 'src/react/index.ts')
-            : resolve(__dirname, 'src/main-vanilla.tsx')
-        },
+        external: ['react', 'react-dom', '@emotion/react', '@emotion/styled'],
         output: {
-          ...(isReactBuild
-            ? {
-                globals: {
-                  react: 'React',
-                  'react-dom': 'ReactDOM',
-                  'react/jsx-runtime': 'ReactJSXRuntime',
-                  '@assistant-ui/react-markdown': 'AssistantUIReactMarkdown',
-                  '@emotion/react': 'emotionReact',
-                  '@emotion/styled': 'emotionStyled',
-                },
-              }
-            : {
-                name: 'EntelligenceChat',
-                format: 'umd',
-                exports: 'named',
-              }),
-          inlineDynamicImports: false,
-          assetFileNames: (assetInfo: AssetInfo) => {
-            if (assetInfo.name?.endsWith('.css')) {
-              return 'assets/[name][extname]';
-            }
-            return 'assets/[name]-[hash][extname]';
+          globals: {
+            react: 'React',
+            'react-dom': 'ReactDOM',
+            '@emotion/react': 'emotionReact',
+            '@emotion/styled': 'emotionStyled'
           },
-          interop: 'compat',
-          format: 'es',
-          esModule: true,
-          exports: 'named'
-        },
+          interop: 'auto'
+        }
       },
-      cssCodeSplit: true,
-      target: 'esnext',
-      reportCompressedSize: false,
       commonjsOptions: {
         include: [/node_modules/],
         transformMixedEsModules: true,
-        defaultIsModuleExports: 'auto',
-        requireReturnsDefault: 'preferred'
-      },
+        defaultIsModuleExports: true,
+        requireReturnsDefault: true,
+        esmExternals: true
+      }
     },
     css: {
       postcss: false,
       modules: false,
       preprocessorOptions: {},
-      transformer: 'none'
-    },
-    optimizeDeps: {
-      include: ['secure-json-parse', 'classnames'],
-      exclude: [
-        '@assistant-ui/react-markdown', 
-        '@assistant-ui/react',
-        '@assistant-ui/react/styles/index.css',
-        '@assistant-ui/react/styles/modal.css'
-      ]
-    },
+    },    
     plugins: [
       cssInjectedByJsPlugin({
         topExecutionPriority: true,
+        processRelativeUrls: true,
+        injectCode: (cssText) => {
+          return fs.readFileSync('dist/vanilla/style.css', 'utf-8');
+        }
       }),
       react({
-        fastRefresh: false,
         jsxRuntime: 'automatic',
         jsxImportSource: 'react',
       }),
       commonjs({
-        requireReturnsDefault: 'preferred',
+        requireReturnsDefault: true,
         transformMixedEsModules: true,
-        extensions: ['.js', '.cjs'],
-        ignore: ['@assistant-ui/react-markdown'],
         esmExternals: true,
         include: [
-          /style-to-js/,
-          /debug/,
-          /extend/,
           /node_modules/,
-          /secure-json-parse/,
-          /classnames/
+          /@assistant-ui/,
         ]
       }),
       dts({
         include: ['src'],
         exclude: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
-        outDir: isReactBuild ? 'dist/types/react' : 'dist/types',
         rollupTypes: true,
         insertTypesEntry: true,
+        compilerOptions: {
+          baseUrl: '.',
+          paths: {
+            '@/*': ['./src/*']
+          }
+        },
       }),
       {
         name: 'empty-css',
         enforce: 'pre',
-        load(id) {
+        load(id: string) {
           if (id.endsWith('.css') && !id.endsWith('.tsx') && !id.endsWith('.ts') && !id.endsWith('.js')) {
-            return 'export default "";';
+            return 'export default {}';
           }
           return null;
         }
       },
       {
         name: 'disable-css-processing',
-        configResolved(config) {
-          const cssPlugin = config.plugins.find(p => p.name === 'vite:css');
+        configResolved(resolvedConfig: UserConfig) {
+          const cssPlugin = resolvedConfig.plugins?.find((p: any) => p.name === 'vite:css');
           if (cssPlugin) {
-            const originalTransform = cssPlugin.transform;
-            cssPlugin.transform = (code, id) => {
+            cssPlugin.transform = (code: string, id: string) => {
               if (id.endsWith('.css') && !id.endsWith('.tsx') && !id.endsWith('.ts') && !id.endsWith('.js')) {
-                return { code: 'export default "";' };
+                return { code: 'export default {}' };
               }
               return null;
             };
@@ -194,7 +139,7 @@ export default defineConfig(({ mode }: { mode: Mode }) => {
           }
           return null;
         }
-      },      
+      },    
     ].filter(Boolean),
     server: {
       port: 5173,
@@ -208,7 +153,18 @@ export default defineConfig(({ mode }: { mode: Mode }) => {
     root: '.',
     publicDir: 'public',
     assetsInclude: ['**/*.css'],
-  } as UserConfig;
+    optimizeDeps: {
+      include: [
+        '@assistant-ui/react',
+        'react',
+        'react-dom',
+        'react/jsx-runtime'
+      ],
+      esbuildOptions: {
+        target: 'es2020',
+      },
+    },
+  };
 
   return config;
 });

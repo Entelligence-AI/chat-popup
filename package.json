@@ -1,6 +1,6 @@
 {
   "name": "@entelligence-ai/chat-widget",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "private": false,
   "publishConfig": {
     "access": "restricted",
@@ -20,7 +20,8 @@
   "scripts": {
     "dev": "npm run combine-css && npm run build:css && vite --config vite.config.ts --force",
     "dev:no-refresh": "npm run build:css && vite --config vite.config.ts --force --mode development",
-    "build": "npm run combine-css && npm run build:css && vite build && vite build --mode react && tsc --project tsconfig.build.json",
+    "build": "npm run combine-css && vite --config vite.config.css.ts build && npm run build:types && vite build && vite build --mode react",
+    "build:types": "tsc --project tsconfig.build.json && tsc --project tsconfig.build.json --outDir dist/types/react --declarationDir dist/types/react --declaration true --emitDeclarationOnly true --jsx react-jsx",
     "combine-css": "node scripts/combine-css.js",
     "build:css": "tailwindcss -i ./src/combined.css -o ./public/styles.css",
     "version:update": "ts-node scripts/version-update.ts",
@@ -30,10 +31,10 @@
     "publish:all": "npm run version:update && npm run publish:github && npm run publish:npm"
   },
   "dependencies": {
-    "@assistant-ui/react": "^0.7.88",
-    "@assistant-ui/react-markdown": "^0.7.21",
-    "@assistant-ui/react-syntax-highlighter": "^0.7.10",
-    "@assistant-ui/react-ui": "^0.1.7",
+    "@assistant-ui/react": "0.7.88",
+    "@assistant-ui/react-markdown": "0.7.21",
+    "@assistant-ui/react-syntax-highlighter": "0.7.10",
+    "@assistant-ui/react-ui": "0.1.7",
     "@radix-ui/react-slot": "^1.1.2",
     "@radix-ui/react-tooltip": "^1.1.8",
     "class-variance-authority": "^0.7.1",
@@ -42,8 +43,8 @@
     "debug": "^4.4.0",
     "extend": "^3.0.2",
     "lucide-react": "^0.475.0",
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
     "react-icons": "^5.4.0",
     "style-to-js": "^1.1.16",
     "tailwind-merge": "^3.0.2"
@@ -53,8 +54,8 @@
     "@eslint/js": "^9.8.0",
     "@rollup/plugin-commonjs": "^25.0.0",
     "@types/node": "^22.13.10",
-    "@types/react": "^18.3.18",
-    "@types/react-dom": "^18.3.5",
+    "@types/react": "18.2.45",
+    "@types/react-dom": "18.2.18",
     "@types/react-syntax-highlighter": "^15.5.13",
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.16",
@@ -74,46 +75,49 @@
     "typescript-eslint": "^8.0.0",
     "vite": "^5.4.0",
     "vite-plugin-css-injected-by-js": "^3.5.1",
-    "vite-plugin-dts": "^4.5.0"
+    "vite-plugin-dts": "^4.5.0",
+    "clean-css": "^5.3.2"
   },
   "main": "./dist/vanilla/entelligence-chat.umd.js",
   "module": "./dist/vanilla/entelligence-chat.es.js",
   "types": "./dist/types/main-vanilla.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/types/main-vanilla.d.ts",
+      "types": "./dist/types/main.d.ts",
       "import": "./dist/vanilla/entelligence-chat.es.js",
       "require": "./dist/vanilla/entelligence-chat.umd.js"
     },
     "./react": {
-      "types": "./dist/types/react/index.d.ts",
-      "module": "./dist/react/entelligence-chat-react.es.js",
+      "types": "./dist/types/react/react/index.d.ts",
       "import": "./dist/react/entelligence-chat-react.es.js",
-      "require": "./dist/react/entelligence-chat-react.umd.js",
-      "default": "./dist/react/entelligence-chat-react.umd.js"
+      "require": "./dist/react/entelligence-chat-react.umd.js"
     },
     "./style.css": {
       "import": "./dist/react/style.css",
       "require": "./dist/react/style.css"
+    },
+    "./styles.css": {
+      "import": "./dist/styles.css",
+      "require": "./dist/styles.css"
     }
   },
   "typesVersions": {
     "*": {
       "react": [
-        "./dist/types/react/index.d.ts"
+        "./dist/types/react/react/index.d.ts"
       ],
       "*": [
-        "./dist/types/main-vanilla.d.ts"
+        "./dist/types/main.d.ts"
       ]
     }
-  },
-  "peerDependencies": {
-    "react": ">=16.8.0",
-    "react-dom": ">=16.8.0"
-  },
+  }, 
   "pnpm": {
     "overrides": {
       "esbuild@<=0.24.2": ">=0.25.0"
     }
+  },
+  "resolutions": {
+    "react": "18.2.0",
+    "@types/react": "18.2.45"
   }
 }
