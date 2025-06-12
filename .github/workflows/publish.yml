@@ -1,0 +1,86 @@
+name: Release and Publish to NPM
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout repo
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.PAT_TOKEN }}
+      
+      # Setup Git
+      - name: Setup Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      # Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org/'
+
+      # Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Bump version using standard-version
+      - name: Bump version using standard-version
+        run: |
+          npx standard-version --release-as patch --skip.commit=false --skip.tag=false
+          echo "VERSION=$(jq -r .version package.json)" >> $GITHUB_ENV
+
+      # Debug remote status
+      - name: Debug remote status
+        run: git remote -v && git status && git log --oneline -n 5
+
+      # Push updated version, tags, and changelog
+      - name: Push version bump and tags
+        run: |    
+          git pull origin main --rebase
+          git push origin main --follow-tags
+          git push origin --tags
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+
+      # Create GitHub Release     
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+        with:
+          tag_name: v${{ env.VERSION }}
+          name: v${{ env.VERSION }}
+          body: |
+            ${{ format('{0}{1}', '## Changelog\n', steps.extract_changelog.outputs.content) }}
+          draft: false
+          prerelease: false
+
+      # Add this new step before the Create Release step
+      - name: Extract changelog entry
+        id: extract_changelog
+        run: |
+          SECTION=$(sed -n "/## v$VERSION/,/##/p" CHANGELOG.md | sed '$d')
+          echo "content<<EOF" >> $GITHUB_OUTPUT
+          echo "$SECTION" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      # Publish to NPM
+      - name: Publish to NPM
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # Success message
+      - name: Success message
+        run: echo "🎉 Successfully published v${{ env.VERSION }} to NPM!"

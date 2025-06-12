@@ -1,0 +1,65 @@
+/* Copy the contents from @assistant-ui/react-markdown/styles/tailwindcss/markdown.css */
+.markdown {
+  @apply text-base leading-7;
+}
+
+.markdown h1 {
+  @apply text-2xl font-bold mb-4 mt-6;
+}
+
+.markdown h2 {
+  @apply text-xl font-bold mb-3 mt-5;
+}
+
+.markdown h3 {
+  @apply text-lg font-bold mb-2 mt-4;
+}
+
+.markdown p {
+  @apply mb-4;
+}
+
+.markdown code {
+  @apply bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded;
+}
+
+.markdown pre {
+  @apply bg-gray-100 dark:bg-gray-800 p-4 rounded mb-4 overflow-x-auto;
+}
+
+.markdown pre code {
+  @apply bg-transparent p-0;
+}
+
+.markdown ul {
+  @apply list-disc pl-5 mb-4;
+}
+
+.markdown ol {
+  @apply list-decimal pl-5 mb-4;
+}
+
+.markdown li {
+  @apply mb-1;
+}
+
+.markdown blockquote {
+  @apply border-l-4 border-gray-300 dark:border-gray-600 pl-4 italic mb-4;
+}
+
+.markdown a {
+  @apply text-blue-600 dark:text-blue-400 hover:underline;
+}
+
+.markdown table {
+  @apply w-full mb-4 border-collapse;
+}
+
+.markdown th,
+.markdown td {
+  @apply border border-gray-300 dark:border-gray-600 p-2;
+}
+
+.markdown th {
+  @apply bg-gray-100 dark:bg-gray-800;
+} 

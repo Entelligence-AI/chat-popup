@@ -5,19 +5,20 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vite + React + TS</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script>
+      // Completely disable React Refresh
+      window.__vite_plugin_react_preamble_installed__ = true;
+      window.$RefreshReg$ = function() {};
+      window.$RefreshSig$ = function() {
+        return function(type) {
+          return type;
+        };
+      };
+    </script>
   </head>
   <body>
-  <script type="module" src="/src/main.tsx"></script>
-    <script type="module" defer>
-      window.EntelligenceChat.init({
-        analyticsData: {
-          repoName: 'assistant-ui',
-          organization: 'Yonom',
-          apiKey: "1234567890",
-          theme: 'system',
-          // Other data
-        }
-      });
-    </script>
+    <div id="root"></div>
+    <script type="module" src="/src/index.tsx"></script>    
   </body>
 </html>

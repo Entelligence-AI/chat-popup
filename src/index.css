@@ -1,7 +1,6 @@
+/* Make sure this file only has Tailwind directives and your custom CSS */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-.aui-md-root > code, .aui-md-root :not(:where(pre)) code {
-    /*border: none;*/
-}
+/* Your custom CSS here */

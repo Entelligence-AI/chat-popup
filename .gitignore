@@ -53,9 +53,30 @@ next-env.d.ts
 #Jetbrains
 .idea/*
 
+# npmrc
+.npmrc
 
+# dist
+dist/
+
+# node_modules
+node_modules/
+
+# log files
+*.log
 
 apps/svendio-backend/
 apps/svendio-frontend/
 .turbo
 .idea/dbnavigator.xml
+
+# temp files
+.temp.css
+
+# npmrc
+.npmrc
+.npmrc.local
+.npmrc.github
+.npmrc.npm
+npmrc.github
+npmrc.npm
