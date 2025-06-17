@@ -17,6 +17,7 @@
     "README.md"
   ],
   "scripts": {
+    "preinstall": "npx npm-force-resolutions",
     "dev": "npm run combine-css && npm run build:css && vite --config vite.config.ts --force",
     "dev:no-refresh": "npm run build:css && vite --config vite.config.ts --force --mode development",
     "build": "npm run combine-css && vite --config vite.config.css.ts build && npm run build:types && vite build && vite build --mode react",
@@ -63,6 +64,7 @@
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.9",
     "globals": "^15.9.0",
+    "npm-force-resolutions": "^0.0.10",
     "postcss": "^8.4.35",
     "posthog-js": "^1.155.0",
     "react-syntax-highlighter": "^15.6.1",
@@ -124,6 +126,7 @@
   "resolutions": {
     "react": "18.2.0",
     "@types/react": "18.2.45",
-    "brace-expansion": ">=2.0.2"
+    "brace-expansion": ">=2.0.2",
+    "minimatch/brace-expansion": "2.0.1"
   }
 }
