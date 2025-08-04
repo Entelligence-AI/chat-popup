@@ -74,7 +74,6 @@ export default defineConfig(({ mode }: { mode: string }) => {
     plugins: [
       cssInjectedByJsPlugin({
         topExecutionPriority: true,
-        processRelativeUrls: true,
         injectCode: (cssText) => {
           return fs.readFileSync('dist/vanilla/style.css', 'utf-8');
         }
@@ -92,21 +91,22 @@ export default defineConfig(({ mode }: { mode: string }) => {
           /@assistant-ui/,
         ]
       }),
-      dts({
-        include: ['src'],
-        exclude: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
-        rollupTypes: true,
-        insertTypesEntry: true,
-        compilerOptions: {
-          baseUrl: '.',
-          paths: {
-            '@/*': ['./src/*']
-          }
-        },
-      }),
+      // Temporarily disabled dts plugin due to path resolution issues
+      // dts({
+      //   include: ['src/react/index.ts', 'src/main-vanilla.tsx', 'src/types/index.ts'],
+      //   exclude: ['src/**/*.test.ts', 'src/**/*.test.tsx', 'src/**/*.d.ts'],
+      //   rollupTypes: true,
+      //   insertTypesEntry: true,
+      //   compilerOptions: {
+      //     baseUrl: '.',
+      //     paths: {
+      //       '@/*': ['./src/*']
+      //     }
+      //   }
+      // }),
       {
         name: 'empty-css',
-        enforce: 'pre',
+        enforce: 'pre' as const,
         load(id: string) {
           if (id.endsWith('.css') && !id.endsWith('.tsx') && !id.endsWith('.ts') && !id.endsWith('.js')) {
             return 'export default {}';

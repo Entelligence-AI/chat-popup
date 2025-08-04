@@ -6,6 +6,6 @@
     "emitDeclarationOnly": true,
     "noEmit": false
   },
-  "include": ["src"],
-  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"]
+  "include": ["src/react/index.ts", "src/main-vanilla.tsx", "src/types/index.ts"],
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/index.tsx"]
 } 
