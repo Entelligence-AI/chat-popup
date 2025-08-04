@@ -1,6 +1,6 @@
 {
   "name": "@entelligence-ai/chat-widget",
-  "version": "0.0.26",
+  "version": "0.0.27",
   "private": false,
   "publishConfig": {
     "access": "public"
@@ -118,15 +118,15 @@
   },
   "pnpm": {
     "overrides": {
-      "esbuild@<=0.24.2": ">=0.25.0",
-      "prismjs@<1.30.0": ">=1.30.0",
-      "brace-expansion@<2.0.2": ">=2.0.2"
+      "esbuild": "0.25.0",
+      "prismjs": "1.30.0",
+      "minimatch": "10.0.3"
     }
   },
   "resolutions": {
     "react": "18.2.0",
     "@types/react": "18.2.45",
-    "brace-expansion": ">=2.0.2",
-    "minimatch/brace-expansion": "2.0.1"
+    "minimatch": "10.0.3",
+    "@eslint/plugin-kit": "0.3.4"
   }
 }
