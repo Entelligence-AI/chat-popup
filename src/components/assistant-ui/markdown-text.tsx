@@ -102,8 +102,28 @@ const defaultComponents = memoizeMarkdownComponents({
     <hr className={cn("my-5 border-b", className)} {...props} />
   ),
   table: ({ className, ...props }) => (
-    <table className={cn("my-5 w-full border-separate border-spacing-0 overflow-y-auto", className)} {...props} />
-  ),
+table: ({ className, children, ...props }) => {
+  // Check if children contain thead element (optional runtime validation)
+  const hasHeader = React.Children.toArray(children).some(
+    child => React.isValidElement(child) && child.type === 'thead'
+  );
+  
+  return (
+    <div className="my-5 overflow-x-auto">
+      <table 
+        className={cn("w-full border-separate border-spacing-0", className)} 
+        {...props}
+      >
+        {children}
+      </table>
+      {!hasHeader && process.env.NODE_ENV !== 'production' && (
+        <div className="text-xs text-amber-500 mt-1">
+          Warning: Tables should include a thead element with th elements for accessibility
+        </div>
+      )}
+    </div>
+  );
+}  ),
   th: ({ className, ...props }) => (
     <th className={cn("bg-muted px-4 py-2 text-left font-bold first:rounded-tl-lg last:rounded-tr-lg [&[align=center]]:text-center [&[align=right]]:text-right", className)} {...props} />
   ),
