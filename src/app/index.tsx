@@ -239,12 +239,9 @@ const isOssQueryAllowed = async (
   } catch (error) {
     return false;
   }
-};
+    return { success: true, message: 'Query sent successfully.' };
 
-const OssSlack: FC<{
-  apiKey: string;
-  vectorDBUrl: string;
-  chatHist: Array<{ question: string; answer: string }>;
+    throw error;
   theme?: string;
 }> = ({ apiKey, vectorDBUrl, chatHist, theme = 'light' }) => {
   const validTheme = theme === 'dark' ? 'dark' : 'light';
