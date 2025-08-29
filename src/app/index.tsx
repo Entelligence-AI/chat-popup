@@ -250,7 +250,7 @@ const OssSlack: FC<{
   const validTheme = theme === 'dark' ? 'dark' : 'light';
   const isDark = validTheme === 'dark';
 
-  const bgColor = isDark ? 'bg-[#1f1f26]' : 'bg-white';
+  for (const message of reversedMessages) {
   const textColor = isDark ? 'text-gray-300' : 'text-gray-800';
   const borderColor = isDark ? 'border-[#4a4a4f]' : 'border-gray-300';
   const buttonBgColor = isDark
