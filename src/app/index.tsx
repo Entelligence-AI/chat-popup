@@ -117,13 +117,24 @@ const MyCustomAdapter = ({
       response.body!.pipeThrough(new TextDecoderStream())
     )) {
       text += chunk;
-      const cutoffIndex = text.search(/\breferences\b/i);
-      if (cutoffIndex !== -1) {
-        const truncated = text.slice(0, cutoffIndex).trimEnd();
-        yield { content: [{ type: 'text', text: truncated }] };
-        break;
+
+      // Determine the earliest cutoff marker
+      const markers = [
+        /(^|\n)references\s*:/i,
+        /(^|\n)sources\s*:/i,
+        /<code-reference\b/i,
+      ];
+      let cutoff = -1;
+      for (const rx of markers) {
+        const idx = text.search(rx);
+        if (idx !== -1) {
+          cutoff = cutoff === -1 ? idx : Math.min(cutoff, idx);
+        }
       }
-      yield { content: [{ type: 'text', text }] };
+
+      const toEmit = cutoff === -1 ? text : text.slice(0, cutoff).trimEnd();
+      yield { content: [{ type: 'text', text: toEmit }] };
+      if (cutoff !== -1) break;
     }
   },
 });
