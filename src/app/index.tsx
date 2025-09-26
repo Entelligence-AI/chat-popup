@@ -105,6 +105,7 @@ const MyCustomAdapter = ({
           vectorDBUrl: `${organization}&${repoName}`,
           enableArtifacts: false,
           advancedAgent: false,
+          enableDocs: false,
           limitSources: 3,
         }),
         signal: abortSignal,
@@ -116,6 +117,12 @@ const MyCustomAdapter = ({
       response.body!.pipeThrough(new TextDecoderStream())
     )) {
       text += chunk;
+      const cutoffIndex = text.search(/\breferences\b/i);
+      if (cutoffIndex !== -1) {
+        const truncated = text.slice(0, cutoffIndex).trimEnd();
+        yield { content: [{ type: 'text', text: truncated }] };
+        break;
+      }
       yield { content: [{ type: 'text', text }] };
     }
   },
