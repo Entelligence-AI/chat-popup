@@ -264,8 +264,34 @@ const OssSlack: FC<{
   vectorDBUrl: string;
   chatHist: Array<{ question: string; answer: string }>;
   theme?: string;
-}> = ({ apiKey, vectorDBUrl, chatHist, theme = 'light' }) => {
+// 1. Extract prop types to improve readability
+type OssSlackProps = {
+  apiKey: string;
+  vectorDBUrl: string;
+  chatHist: Array<{ question: string; answer: string }>;
+  theme?: string;
+};
+
+// 2. Extract theme-related logic to a custom hook
+const useThemeStyles = (theme = 'light') => {
   const validTheme = theme === 'dark' ? 'dark' : 'light';
+  const isDark = validTheme === 'dark';
+
+  return {
+    bgColor: isDark ? 'bg-[#1f1f26]' : 'bg-white',
+    textColor: isDark ? 'text-gray-300' : 'text-gray-800',
+    borderColor: isDark ? 'border-[#4a4a4f]' : 'border-gray-300',
+    buttonBgColor: isDark ? 'bg-[#C7E576] text-gray-900' : 'bg-[#C7E576] text-black',
+    hoverEffect: isDark ? 'hover:opacity-80' : 'hover:opacity-90'
+  };
+};
+
+// 3. Simplified component with reduced complexity
+const OssSlack: FC<OssSlackProps> = ({ apiKey, vectorDBUrl, chatHist, theme = 'light' }) => {
+  const styles = useThemeStyles(theme);
+  
+  // Rest of the component using styles...
+};  const validTheme = theme === 'dark' ? 'dark' : 'light';
   const isDark = validTheme === 'dark';
 
   const bgColor = isDark ? 'bg-[#1f1f26]' : 'bg-white';
