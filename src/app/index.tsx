@@ -425,8 +425,7 @@ const MyThread: FC<{
   const reversedMessages = [...messages].reverse();
   let currentPair: { question?: string; answer?: string } = {};
 
-  for (const message of reversedMessages.reverse()) {
-    const text = message.content
+for (const message of reversedMessages) {    const text = message.content
       ?.map((c) => (c.type === 'text' ? c.text : ''))
       .join(' ');
 
