@@ -254,10 +254,13 @@ const isOssQueryAllowed = async (
 
     const data = await response.json();
     return data.allowed === true;
-  } catch (error) {
-    return false;
-  }
-};
+try {
+  const data = await response.json();
+  return data.allowed === true;
+} catch (error) {
+  console.error('Error checking permissions:', error);
+  return false;
+}};
 
 const OssSlack: FC<{
   apiKey: string;
